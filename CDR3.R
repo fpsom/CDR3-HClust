@@ -1,5 +1,7 @@
 # Insert Data
-data <- read.csv(file.choose(), header = TRUE, sep = ";")
+# data <- read.csv(file.choose(), header = TRUE, sep = ";")
+data <- read.csv("data/SampleData.csv", header = TRUE, sep = ";")
+
 
 # Usefull Data
 udata <- data[c(1,3)]
@@ -14,7 +16,7 @@ mymat <- matrix(0,nrow=20, ncol=26)
 
 # Create the absolute matrix
 for (i in 1:20){
-  gram <- 65          # letter "Á" in ascii code
+  gram <- 65          # letter "?" in ascii code
   for (j in 1:26){
     for (k in 1:length(udata$Sequence.ID)){
       xar <- strsplit(udata$AA.JUNCTION[k], '')[[1]][i]
