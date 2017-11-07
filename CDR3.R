@@ -1,7 +1,7 @@
 # Insert Data
 library("stringr")
 library("dplyr")
-# data <- read.csv(file.choose(), header = TRUE, sep = ";")
+#data <- read.csv(file.choose(), header = TRUE, sep = ";")
 data <- read.csv("data/SampleData.csv", header = TRUE, sep = ";")
 
 
@@ -9,58 +9,63 @@ data <- read.csv("data/SampleData.csv", header = TRUE, sep = ";")
 udata <- data[c(1,3)]
 udata$AA.JUNCTION <- as.character(udata$AA.JUNCTION)
 
-# Convert character to ascii
-asc <- function(x) { strtoi(charToRaw(x),16L) }
-asc("a")
-
-# Convert ascii to character
-chr <- function(n) { rawToChar(as.raw(n)) }
-chr(asc("a"))
-
-MyMatrix <- function(z,y){ # A function which computes the absolute and percentage matrix for a dataframe
-  mymat <- matrix(0,nrow=20, ncol=26)
-  permat <- matrix(0,nrow=20, ncol=26)
-  
-  gram <- 65          # letter "?" in ascii code
+# Function Lett finds the used letters in our sequences 
+Lett <- function(df){
+  j = 1
+  z = vector(length = 26)
   for (i in 1:26){
-    for (j in 1:20){
-      if(i>1 && i<26 && rr != 0){
-        permat[j,i-1] = (mymat[j,i-1] / rr) * 100 # percentege matrix
-      }
-      for (k in 1:length(z$Sequence.ID)){
-        xar <- str_sub(z$AA.JUNCTION[k],j,j)
-        if ( asc(xar) == gram){
-          mymat[j,i] <- mymat[j,i] + 1 # absolute matrix
-        }
-      }
-    }
-    rr = sum(mymat[,i]) # sum for every row
-    gram <- gram + 1
-  }
-  # completing the percentage matrix with the last letter 
-  if(rr != 0){
-    for(i in 1:20){
-      permat[i,26] = (mymat[i,26] / rr) * 100
+    temp = str_count(df$AA.JUNCTION, LETTERS[i])
+    if (sum(temp)==0){
+      z[j] = i
+      j = j+1
     }
   }
-  # Deciding which matrix we want to return
-  if (y == 0){
-  return (mymat)
-  }
-  return (permat)
+  let = LETTERS[-z]
+  Matrices(df,let)   # Call the function Matrices
 }
 
-# Create the absolute matrix for the udata
-umat = MyMatrix(udata,0)
+# Function Matrices compute the apsolute matrix and the matrix with percentages
+Matrices <- function(df1,let){
+  mymat <- matrix(0,nrow=length(let), ncol=str_length(df1$AA.JUNCTION[1]))
+  permat <- matrix(0,nrow=length(let), ncol=str_length(df1$AA.JUNCTION[1]))
+  for (i in 1:length(let)) {
+    for (j in 1:str_length(df1$AA.JUNCTION[1])) {
+      for (k in 1:length(df1$AA.JUNCTION)) {
+        xar <- str_sub(df1$AA.JUNCTION[k],j,j)
+        if ( xar == let[i]){
+          mymat[i,j] = mymat[i,j] + 1
+        }
+      }
+      permat[i,j] = (mymat[i,j] / length(df1$AA.JUNCTION)) * 100
+    }
+  }
+  Choice(permat,df1,let) # Call the function Choice
+}
 
-# Create the percentege matrix for the udata
-uper = MyMatrix(udata,1)
+# Function Choise choose which matrix cell will be used for the division of the data 
+Choice <- function(pin,df2,let){
+  cel = which(pin == max(pin), arr.ind = TRUE)
+  if (max(pin) == 100){ # We exclude the 100 % from the max values
+    cel = which(pin == max(pin[pin!=max(pin)]), arr.ind = TRUE) # the desired cell
+  }
+  Divide(df2,cel,let) # Call the function Divide
+}
 
-# finding the 2 sub-data frames (example for cell(11,18))
-l = chr(64+18) # letter
-x = filter(udata,str_detect(str_sub(udata$AA.JUNCTION,11,11), l))
-y = filter(udata,!str_detect(str_sub(udata$AA.JUNCTION,11,11), l))
+# Function Divide divide the data into 2 new data frames
+Divide <- function(df3,cel,let){
+  df4 = filter(df3,str_detect(str_sub(df3$AA.JUNCTION,cel[1,2],cel[1,2]), let[cel[1,1]])) # we use the first max value
+  df5 = filter(df3,!str_detect(str_sub(df3$AA.JUNCTION,cel[1,2],cel[1,2]), let[cel[1,1]]))
+  Control(df4,df5,cel,let)   # Call the function Control
+} 
 
-# finding the percentage matrix for these data frames 
-per1 = MyMatrix(x,1)
-per2 = MyMatrix(y,1)
+# Function Control check if the data frame's length is small enough
+Control <- function(df6,df7,cel,let){
+  if (length(df6$AA.JUNCTION) <2){
+    return (list (df6,df7))
+  } else if (length(df7$AA.JUNCTION) <2) {
+    return (list (df6,df7))
+  }
+  Matrices(df6,let) # Call the function Matrices
+  Matrices(df7,let) # Call the function Matrices
+}
+
