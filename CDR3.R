@@ -1,71 +1,79 @@
 # Insert Data
 library("stringr")
 library("dplyr")
-#data <- read.csv(file.choose(), header = TRUE, sep = ";")
-data <- read.csv("data/SampleData.csv", header = TRUE, sep = ";")
+library("entropy")
+data <- read.csv(file.choose(), header = TRUE, sep = ";")
+#data <- read.csv("data/SampleData.csv", header = TRUE, sep = ";")
 
 
 # Usefull Data
 udata <- data[c(1,3)]
 udata$AA.JUNCTION <- as.character(udata$AA.JUNCTION)
+let = c("A","C","D","E","F","G","H","I","K","L","M","N","P","Q","R","S","T","V","W","Y") # The letters matrix
+br = 0 # initial value of branch
+cl = 0 # initial value of new clusters 
+udata$clusters = 0 # initialiaze the column clusters with 0
+udata$End = FALSE # initialize the column End with FALSE
 
-# Function Lett finds the used letters in our sequences 
-Lett <- function(df){
-  j = 1
-  z = vector(length = 26)
-  for (i in 1:26){
-    temp = str_count(df$AA.JUNCTION, LETTERS[i])
-    if (sum(temp)==0){
-      z[j] = i
-      j = j+1
-    }
-  }
-  let = LETTERS[-z]
-  Matrices(df,let)   # Call the function Matrices
-}
-
-# Function Matrices compute the apsolute matrix and the matrix with percentages
-Matrices <- function(df1,let){
-  mymat <- matrix(0,nrow=length(let), ncol=str_length(df1$AA.JUNCTION[1]))
-  permat <- matrix(0,nrow=length(let), ncol=str_length(df1$AA.JUNCTION[1]))
-  for (i in 1:length(let)) {
-    for (j in 1:str_length(df1$AA.JUNCTION[1])) {
-      for (k in 1:length(df1$AA.JUNCTION)) {
-        xar <- str_sub(df1$AA.JUNCTION[k],j,j)
-        if ( xar == let[i]){
-          mymat[i,j] = mymat[i,j] + 1
-        }
+Matrices <- function(df1,br1,cl1){
+  mymat <- matrix(0,nrow=length(let) + 1, ncol=str_length(df1$AA.JUNCTION[1]))
+  permat <- matrix(0,nrow=length(let) + 1, ncol=str_length(df1$AA.JUNCTION[1]))
+  for (i in 1:str_length(df1[df1$clusters == br1,]$AA.JUNCTION[1])) {
+    f <- table(str_sub(df1[df1$clusters == br1,]$AA.JUNCTION,i,i))       # A table with the letters from a specific position 
+    k = 1
+    for(j in 1:length(let)){
+      if (names(f[k]) == let[j] && k <= length(f)){      # We create the mymat with the values of the previous table and zeroes to other letters 
+        mymat[j,i] = f[k]
+        k = k + 1
+      } else{
+        mymat[j,i] = 0
       }
-      permat[i,j] = (mymat[i,j] / length(df1$AA.JUNCTION)) * 100
+      permat[j,i] = (mymat[j,i] / length(df1[df1$clusters == br1,]$AA.JUNCTION)) * 100        # We calculate the percentage matrix
+    }
+    permat[j+1,i] = entropy(f,base=exp(1))              # We calculate the entropy for every position (row 21)
+  }
+  Choice(df1,permat,br1,cl1)
+}
+
+
+Choice <- function(df2,pin,br2,cl2){
+  cel = which(pin == max(pin), arr.ind = TRUE)
+  ela = 1
+  if (max(pin) == 100){     # We exclude the 100 % from the max values
+    cel = which(pin == max(pin[pin!=max(pin)]), arr.ind = TRUE)    # the desired cell
+  } 
+  if ((length(cel)/2) > 1){
+    for(i in 2:(length(cel)/2)){
+      if (pin[21,cel[i,2]] < pin[21,cel[ela,2]]) {          # if the percentage is the same (cel multidimensional) we keep the cel with the lowest entropy
+        ela = i
+      }
     }
   }
-  Choice(permat,df1,let) # Call the function Choice
+  Divide(df2,br2,cl2,cel,ela)
 }
 
-# Function Choise choose which matrix cell will be used for the division of the data 
-Choice <- function(pin,df2,let){
-  cel = which(pin == max(pin), arr.ind = TRUE)
-  if (max(pin) == 100){ # We exclude the 100 % from the max values
-    cel = which(pin == max(pin[pin!=max(pin)]), arr.ind = TRUE) # the desired cell
-  }
-  Divide(df2,cel,let) # Call the function Divide
+
+Divide <- function(df3,br3,cl3,cel,ela){      # We change the clusters column for the 2 new Clusters
+  df3[df3$clusters == br3,]$clusters <- ifelse(str_detect(str_sub(df3[df3$clusters == br3,]$AA.JUNCTION,cel[ela,2],cel[ela,2]), let[cel[ela,1]]), cl3+1 ,cl3+2)
+  cl3 = cl3 + 2                               # the value of the new clusters
+  Control(df3,br3,cl3)
 }
 
-# Function Divide divide the data into 2 new data frames
-Divide <- function(df3,cel,let){
-  df4 = filter(df3,str_detect(str_sub(df3$AA.JUNCTION,cel[1,2],cel[1,2]), let[cel[1,1]])) # we use the first max value
-  df5 = filter(df3,!str_detect(str_sub(df3$AA.JUNCTION,cel[1,2],cel[1,2]), let[cel[1,1]]))
-  Control(df4,df5,cel,let)   # Call the function Control
-} 
 
-# Function Control check if the data frame's length is small enough
-Control <- function(df6,df7,cel,let){
-  if (length(df6$AA.JUNCTION) <2){
-    return (list (df6,df7))
-  } else if (length(df7$AA.JUNCTION) <2) {
-    return (list (df6,df7))
+Control <- function(df4,br4,cl4){
+  if (nrow(df4[df4$clusters == cl4,]) <= 2){      # We check if the number of sequences for this Cluster is <= 2
+    df4[df4$clusters == cl4,]$End = TRUE          # we change the End column
+    br4 = cl4 - 1                                 # the new branch
+    if (nrow(df4[df4$clusters == cl4-1,]) <= 2){  # We check if the number of sequences for the previous Cluster is <= 2
+      df4[df4$clusters == cl4-1,]$End = TRUE      # we change the End column
+      if (nrow(df4[df4$End == FALSE,]) <= 2 ){    # We check if the number of sequences with the End column FALSE (remaining sequences) is <= 2
+        return(df4)                               # We end our algortihm
+      }
+      br4 = max((df4[df4$End == FALSE,])$clusters)   # the new branch
+    }
+  } else {
+    br4 = cl4   # the new branch
   }
-  Matrices(df6,let) # Call the function Matrices
-  Matrices(df7,let) # Call the function Matrices
+  Matrices(df4,br4,cl4)
 }
 
