@@ -6,8 +6,8 @@ library("ggplot2")
 library("ggseqlogo")
 library("gridExtra")
 library("cluster")
-data <- read.csv(file.choose(), header = TRUE, sep = ";")
-#data <- read.csv("data/SampleData.csv", header = TRUE, sep = ";")
+#data <- read.csv(file.choose(), header = TRUE, sep = ";")
+data <- read.csv("data/SampleData.csv", header = TRUE, sep = ";")
 
 
 # Usefull Data
