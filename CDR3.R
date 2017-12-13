@@ -8,6 +8,7 @@
 #install.packages("gridExtra")
 #install.packages("cluster")
 #install.packages("seqinr")
+#install.packages("collapsibleTree")
 library("stringr")
 library("dplyr")
 library("entropy")
@@ -16,6 +17,7 @@ library("ggseqlogo")
 library("gridExtra")
 library("cluster")
 library("seqinr")
+library("collapsibleTree")
 #data <- read.csv(file.choose(), header = TRUE, sep = ";")
 data <- read.csv("data/SampleData.csv", header = TRUE, sep = ";")
 
@@ -378,7 +380,7 @@ names(aa) = se
 x3 # Print in console
 write.fasta(aa, names= names(aa) ,file = sprintf("Cluster.%d", clust)) # Create a fasta file
 Opt(x3) 
-opt2(x3)
+Opt2(x3)
 
 # Sequences and Id's for specific level
 level = 7
@@ -391,12 +393,55 @@ names(aa2) = se2
 x4 # Print in console
 write.fasta(aa2, names= names(aa2) ,file = sprintf("Level.%d", level)) # Create a fasta file
 Opt(x4)
-opt2(x4)
+Opt2(x4)
 
 # Plot the identity(sumper)
 ff = lastlist$dfsum
 ff$level[1]= 0
 ff$level[2:(length(lastlist$clep[ff$branch]) +1 )] = lastlist$clep[ff$branch]
 par(xpd=TRUE)
-plot(ff$branch,ff$sumper,col = ff$level, pch = ff$level, main = "Identity Plot", xlab = "Number of Clusters", ylab = "Identity")
-legend("topright",inset=c(-0.05,0.11), col = unique(ff$level), pch = unique(ff$level), legend= unique(sprintf("Level.%d", ff$level)),cex = 0.6)
+plot(ff$level,ff$sumper, main = "Identity Plot", xlab = "Levels", ylab = "Identity")
+
+# Create a dataframe with all clusters and their identity and similarity percentage 
+ssb = as.data.frame(matrix(100, ncol = 3, nrow = 167))
+ssb$V3 = 0:166
+for(i in 1:length(ff$branch) ){
+  ll = which(ssb$V3 == ff$branch[i])
+  ssb$V1[ll] = ff$sumper[i]
+  ssb$V2[ll] = ff$sumper2[i]
+}
+
+trid = df[4:23] # Data frame with identities perventage
+trsim = df[4:23] # Data frame with similarities perventage
+for(i in 1:length(trid)){
+  trid[i] = ssb$V1[trid[,i]+1]
+  trsim[i] = ssb$V2[trsim[,i]+1]
+}
+
+# Tree plot with clusters as Nodes
+collapsibleTree(
+  df,
+  hierarchy = c("level.0", "level.1", "level.2" ,"level.3" ,"level.4" ,"level.5" ,"level.6" ,"level.7" ,"level.8" ,"level.9","level.10", "level.11", "level.12" ,"level.13" ,"level.14" ,"level.15" ,"level.16" ,"level.17" ,"level.18" ,"level.19"),
+  width = 1800,
+  height = 700,
+  collapsed = FALSE
+)
+# Tree plot with identities percentage as Nodes
+collapsibleTree(
+  trid,
+  hierarchy = c("level.0", "level.1", "level.2" ,"level.3" ,"level.4" ,"level.5" ,"level.6" ,"level.7" ,"level.8" ,"level.9","level.10", "level.11", "level.12" ,"level.13" ,"level.14" ,"level.15" ,"level.16" ,"level.17" ,"level.18" ,"level.19"),
+  width = 1800,
+  height = 700,
+  collapsed = FALSE
+)
+# Tree plot with similarities percentage as Nodes
+collapsibleTree(
+  trsim,
+  hierarchy = c("level.0", "level.1", "level.2" ,"level.3" ,"level.4" ,"level.5" ,"level.6" ,"level.7" ,"level.8" ,"level.9","level.10", "level.11", "level.12" ,"level.13" ,"level.14" ,"level.15" ,"level.16" ,"level.17" ,"level.18" ,"level.19"),
+  width = 1800,
+  height = 700,
+  collapsed = FALSE
+)
+
+
+
