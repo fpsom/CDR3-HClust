@@ -352,7 +352,7 @@ AminoCl <- function(clust){
   x3 # Print in console
 }
 
-lev = 3 #determine the level
+lev = 6 #determine the level
 
 df = df[ do.call( order , df[ , match(  colnames(df[str_which(names(df), "level.")]) , names(df) ) ]  ) , ]
 df_args <- c(df[str_which(names(df), "level.")], sep="/")
@@ -414,12 +414,24 @@ for(i in 1:(max(bo)+1)){
   }
 }
 
+thrtyp = ffg
+thr = 5
+
+tempor = ffg
+tempor2 = ffg2
+tempor3 = ffg3
+tempor[which(thrtyp > thr)] = 0
+tempor2[which(thrtyp > thr)] = 0
+tempor3[which(thrtyp> thr)] = 0
+#tempor3
+
 # Damerau–Levenshtein
 matrix.heatmap(ffg) # heatmap for distance between 2 Nodes
 matrix.heatmap(ffg2) # heatmap for string distance between 2 Nodes (string from function Opt())
 matrix.heatmap(ffg3) # heatmap for final distance combining ffg and ffg2
 jjj = matrix(1,nrow = max(bo)+1,ncol = (max(bo)+1))
 net0 <- graph_from_adjacency_matrix(jjj,mode = "upper")
+net1 <- graph_from_adjacency_matrix(jjj,mode = "upper")
 
 bb = vector(length = (max(bo)+1))
 bb[1]=0
@@ -429,26 +441,58 @@ bb[2:length(bb)] = lastlist$clep[1:max(bo)]
 colrs <- c("#1E90FF", "#BA55D3", "#0000FF", "#557fd2", "#54d17e", "#8aad62", "#C6E2FF", "#e5e234", "#FFD700", "#00EE00", "#C1FFC1", "#ea8509", "#54FF9F", "#FF0000", "#ed3b1c", "#ed1c7a", "#0c0c0c", "#b8d8af", "#ED9121","#45f713")
 colrs = colrs[1:(max(bb)+1)]
 V(net0)$color <- colrs[bb+1]
+V(net1)$color <- colrs[bb+1]
 
 # Compute node degrees (#links) and use that to set node size:
 deg <- Clus$seqnum[1:length(bb)] / 5
 V(net0)$size <- deg
+V(net1)$size <- deg
 
 # The labels are currently node IDs.
 # Setting them to NA will render no labels:
-V(net0)$label <- NA
+V(net0)$label <- V(net0)-1
+V(net1)$label <- V(net1)-1
 
 # Set edge width based on weight:
 hhh = na.omit(as.vector(t(ffg3)))
-hhh[which(na.omit(as.vector(t(ffg3))) == 0)] = 0.01
+hhh1 = na.omit(as.vector(t(tempor3)))
+#hhh[which(na.omit(as.vector(t(ffg3))) == 0)] = 0.01
 E(net0)$width <- hhh #na.omit(as.vector(t(ffg3)))
+#E(net1)$width <- hhh1 
 
 #change arrow size and edge color:
 E(net0)$arrow.size <- .2
 E(net0)$edge.color <- "gray80"
+E(net1)$arrow.size <- .2
+E(net1)$edge.color <- "gray80"
 
 edge.start <- ends(net0, es=E(net0), names=F)[,1]
 edge.col <- V(net0)$color[edge.start]
-plot(net0, edge.color=edge.col, edge.curved=.1) #plot the network graph
+
+# Create the grid (we need to miximize the pop-up window in order to have a perfect fit)
+get( getOption( "device" ) )()
+
+net0.copy <- delete.edges(net0, which(E(net0)$width == 0))
+plot(net0.copy, edge.color=edge.col, edge.curved=.1, vertex.label.color = "black") #plot the network graph
 legend(x=-2.5, y=1, colnames(df[str_which(names(df), "level.")])[1:(max(bb)+1)], pch=21,
        col="#777777", pt.bg=colrs, pt.cex=2, cex=.8, bty="n", ncol=1)
+
+
+pal1 <- rainbow(6, alpha=1) 
+get( getOption( "device" ) )()
+#net1.copy <- delete.edges(net1, which(E(net1)$width == 0))
+net1.copy <- delete.edges(net1, which(hhh1 == 0))
+plot(net1.copy, edge.color=na.omit(pal1[(ffg3 %/% 1) +1]), edge.curved=.1, vertex.label.color = "black") #plot the network graph
+legend(x=-2.5, y=1, colnames(df[str_which(names(df), "level.")])[1:(max(bb)+1)], pch=21,
+       col="#777777", pt.bg=colrs, pt.cex=2, cex=.8, bty="n", ncol=1)
+legend(x=+2.5, y=1, c("0-1","1-2","2-3","3-4","4-5","5"), pch=21,
+       col="#777777", pt.bg=pal1, pt.cex=2, cex=.8, bty="n", ncol=1,title = "Relationship strength")
+
+
+#na.omit(ff[(ffg3 %/% 1) +1])
+#hhh = na.omit(as.vector(t(tempor3)))
+#hhh[which(na.omit(as.vector(t(tempor3))) == 0)] = 0.01
+#hhh = na.omit(hhh)
+
+
+
