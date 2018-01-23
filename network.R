@@ -12,6 +12,9 @@
 #install.packages('stringdist')
 #install.packages("igraph")
 #install.packages("plsgenomics")
+#install.packages('ndtv', dependencies=T)
+library('network')
+library('ndtv')
 library('stringdist')
 library("plsgenomics")
 library("igraph")
@@ -352,7 +355,7 @@ AminoCl <- function(clust){
   x3 # Print in console
 }
 
-lev = 6 #determine the level
+lev = 5 #determine the level
 
 df = df[ do.call( order , df[ , match(  colnames(df[str_which(names(df), "level.")]) , names(df) ) ]  ) , ]
 df_args <- c(df[str_which(names(df), "level.")], sep="/")
@@ -410,10 +413,19 @@ for(i in 1:(max(bo)+1)){
     temp2N2 = Opt(AminoCl(j-1))
     temp2N2 = str_replace_all(temp2N2,"_"," ")
     ffg2[i,j] = stringdist(temp2N1,temp2N2,method = "lv" )
-    ffg3[i,j] = -0.25 * ffg[i,j] * 0.7692308 + 0.25 * ffg2[i,j]
+    #ffg3[i,j] = -0.25 * ffg[i,j] * 0.7692308 + 0.25 * ffg2[i,j]
+    if( i == j ){
+      ffg2[i,j] = 20 #gia na mhn fainontai velakia pisw
+    }
   }
 }
 
+#find max
+ma =max(na.omit(as.vector(ffg)))
+
+ffg[which(ffg == 0)] = ma #gia na mhn fainontai velakia pisw
+
+ffg3 = 0.125 * (20 - ffg2) + 0.125 * (ma - ffg) * (20 / ma)
 thrtyp = ffg
 thr = 5
 
@@ -424,6 +436,7 @@ tempor[which(thrtyp > thr)] = 0
 tempor2[which(thrtyp > thr)] = 0
 tempor3[which(thrtyp> thr)] = 0
 #tempor3
+
 
 # Damerau–Levenshtein
 matrix.heatmap(ffg) # heatmap for distance between 2 Nodes
@@ -458,7 +471,7 @@ hhh = na.omit(as.vector(t(ffg3)))
 hhh1 = na.omit(as.vector(t(tempor3)))
 #hhh[which(na.omit(as.vector(t(ffg3))) == 0)] = 0.01
 E(net0)$width <- hhh #na.omit(as.vector(t(ffg3)))
-#E(net1)$width <- hhh1 
+E(net1)$width <- hhh1 
 
 #change arrow size and edge color:
 E(net0)$arrow.size <- .2
@@ -466,33 +479,71 @@ E(net0)$edge.color <- "gray80"
 E(net1)$arrow.size <- .2
 E(net1)$edge.color <- "gray80"
 
-edge.start <- ends(net0, es=E(net0), names=F)[,1]
-edge.col <- V(net0)$color[edge.start]
+#edge.start <- ends(net0, es=E(net0), names=F)[,1]
+#edge.col <- V(net0)$color[edge.start]
 
 # Create the grid (we need to miximize the pop-up window in order to have a perfect fit)
 get( getOption( "device" ) )()
-
-net0.copy <- delete.edges(net0, which(E(net0)$width == 0))
-plot(net0.copy, edge.color=edge.col, edge.curved=.1, vertex.label.color = "black") #plot the network graph
-legend(x=-2.5, y=1, colnames(df[str_which(names(df), "level.")])[1:(max(bb)+1)], pch=21,
-       col="#777777", pt.bg=colrs, pt.cex=2, cex=.8, bty="n", ncol=1)
-
-
 pal1 <- rainbow(6, alpha=1) 
-get( getOption( "device" ) )()
-#net1.copy <- delete.edges(net1, which(E(net1)$width == 0))
-net1.copy <- delete.edges(net1, which(hhh1 == 0))
-plot(net1.copy, edge.color=na.omit(pal1[(ffg3 %/% 1) +1]), edge.curved=.1, vertex.label.color = "black") #plot the network graph
-legend(x=-2.5, y=1, colnames(df[str_which(names(df), "level.")])[1:(max(bb)+1)], pch=21,
+net0.copy <- igraph::delete.edges(net0, which(E(net0)$width == 0))
+net0.copy <- delete.edges(net0, which(ffg == 0))
+
+plot(net0.copy, edge.color=na.omit(pal1[( E(net0.copy)$width %/% 1) +1]), edge.curved=.1, vertex.label.color = "black") #plot the network graph
+legend("topleft", inset=c(0.1,0.2), colnames(df[str_which(names(df), "level.")])[1:(max(bb)+1)], pch=21,
        col="#777777", pt.bg=colrs, pt.cex=2, cex=.8, bty="n", ncol=1)
-legend(x=+2.5, y=1, c("0-1","1-2","2-3","3-4","4-5","5"), pch=21,
+legend("topright", inset=c(0.1,0.2), c("0-1","1-2","2-3","3-4","4-5","5"), pch=21,
        col="#777777", pt.bg=pal1, pt.cex=2, cex=.8, bty="n", ncol=1,title = "Relationship strength")
 
 
-#na.omit(ff[(ffg3 %/% 1) +1])
-#hhh = na.omit(as.vector(t(tempor3)))
-#hhh[which(na.omit(as.vector(t(tempor3))) == 0)] = 0.01
-#hhh = na.omit(hhh)
+
+get( getOption( "device" ) )()
+net1.copy <- igraph::delete.edges(net1, which(E(net1)$width == 0))
+#net1.copy <- delete.edges(net1, which(hhh1 == 0))
+#plot(net1.copy, edge.color=na.omit(pal1[(tempor3 %/% 1) +1]), edge.curved=.1, vertex.label.color = "black") #plot the network graph
+plot(net1.copy, edge.color=na.omit(pal1[( E(net1.copy)$width %/% 1) +1]), edge.curved=.1, vertex.label.color = "black") #plot the network graph
+
+legend("topleft", inset=c(0.1,0.2), colnames(df[str_which(names(df), "level.")])[1:(max(bb)+1)], pch=21,
+       col="#777777", pt.bg=colrs, pt.cex=2, cex=.8, bty="n", ncol=1)
+legend("topright", inset=c(0.1,0.2), c("0-1","1-2","2-3","3-4","4-5","5"), pch=21,
+       col="#777777", pt.bg=pal1, pt.cex=2, cex=.8, bty="n", ncol=1,title = "Relationship strength")
 
 
+# Interactive
+net0links = as_edgelist(graph = net0.copy)
+net0links = as.data.frame(net0links)
+net1links = as_edgelist(graph = net1.copy)
+net1links = as.data.frame(net1links)
+colnames(net0links) = c("from","to")
+colnames(net1links) = c("from","to")
+net0nodes = data.frame(id = 1:(max(bo)+1))
+net1nodes = data.frame(id = 1:(max(bo)+1))
 
+nn0 = network(net0links,  vertex.attr=net0nodes, matrix.type="edgelist",loops=F, multiple=F, ignore.eval = F)
+nn0 %v% "color" = V(net0.copy)$color
+nn0 %e% "width" = E(net0.copy)$width
+EE0 = V(net0.copy)$size
+EE0[which(EE0 >10)]  = EE0[which(EE0 >10)] /5
+nn0 %v% "size" = EE0
+nn0 %v% "label"= V(net0.copy)$label
+nn0 %e% "color"= na.omit(pal1[( E(net0.copy)$width %/% 1) +1])
+#plot.network(nn0,vertex.col =  nn0 %v% "color",
+#     vertex.cex =  nn0 %v% "size", label = nn0 %v% "label", edge.lwd = nn0 %e% "width" , edge.col = nn0 %e% "color")
+
+render.d3movie(nn0, usearrows = F, displaylabels = TRUE, bg="#ffffff", 
+               vertex.border="#ffffff", vertex.col =  nn0 %v% "color",
+               vertex.cex = nn0 %v% "size", label = nn0 %v% "label", edge.lwd = nn0 %e% "width" , edge.col = nn0 %e% "color",output.mode = "htmlWidget")  
+
+
+nn1 = network(net1links,  vertex.attr=net1nodes, matrix.type="edgelist",loops=F, multiple=F, ignore.eval = F)
+nn1 %v% "color" = V(net1.copy)$color
+nn1 %e% "width" = E(net1.copy)$width
+EE1 = V(net1.copy)$size
+EE1[which(EE1 >10)]  = EE1[which(EE1 >10)] /5
+nn1 %v% "size" = EE1
+nn1 %v% "label"= V(net1.copy)$label
+nn1 %e% "color"= na.omit(pal1[( E(net1.copy)$width %/% 1) +1])
+#plot.network(nn1,vertex.col =  nn1 %v% "color",
+#             vertex.cex =  nn1 %v% "size", label = nn1 %v% "label", edge.lwd = nn1 %e% "width" , edge.col = nn1 %e% "color")
+render.d3movie(nn1, usearrows = F, displaylabels = TRUE, bg="#ffffff", 
+               vertex.border="#ffffff", vertex.col =  nn1 %v% "color",
+               vertex.cex = nn1 %v% "size", label = nn1 %v% "label", edge.lwd = nn1 %e% "width" , edge.col = nn1 %e% "color",output.mode = "htmlWidget")  
