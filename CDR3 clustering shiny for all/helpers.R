@@ -39,7 +39,7 @@ Matrices <- function(list1,leaf,let,sim,d,algo,algocol){
   names(listxx)[length(listxx)] = sprintf('permat_br.%d', br) # Save the permat with this format
   listyy$temp = persim
   names(listyy)[length(listyy)] = sprintf('persim_br.%d', br)
-  result1=list("dfsum" = list1$dfsum,"list" = listxx,"listn" = listyy, "udata" = udata,"permat"= permat, "persim" = persim, "br" = br, "cl" = cl, "met" = list1$met, "ep" = list1$ep, "clep" = list1$clep, "nn" = list1$nn, "sumper" =list1$sumper,"sumper2" = list1$sumper2, "ela" = list1$ela, "cel" = list1$cel, "endper" = list1$endper)
+  result1=list("ggdf" = list1$ggdf, "dfsum" = list1$dfsum,"list" = listxx,"listn" = listyy, "udata" = udata,"permat"= permat, "persim" = persim, "br" = br, "cl" = cl, "met" = list1$met, "ep" = list1$ep, "clep" = list1$clep, "nn" = list1$nn, "sumper" =list1$sumper,"sumper2" = list1$sumper2, "ela" = list1$ela, "cel" = list1$cel, "endper" = list1$endper, "last" = list1$last)
   if ( leaf == TRUE){
     Finish(result1,TRUE,let,sim,d,algo,algocol)
   }else{
@@ -57,7 +57,9 @@ Finish <- function(list2,leaf,let,sim,d,algo,algocol){
   endper = list2$endper
   dfsum = list2$dfsum
   br = list2$br
+  cl = list2$cl
   nn = list2$nn
+  last = list2$last
   t1 =which(permat[-length(permat),] == 100,arr.ind = TRUE)
   sumper = (length(as.numeric(t1[,2]))* 100) / str_length(udata$AA.JUNCTION[1])
   t2 =which(persim[-length(persim),] == 100,arr.ind = TRUE)
@@ -66,20 +68,46 @@ Finish <- function(list2,leaf,let,sim,d,algo,algocol){
     if (sumper > endper){
       nn = TRUE  # When nn = TRUE the percentage of sumper < endper%
       if (sumper2 > endper){
+        last = last+1
+        if (last == 1 && leaf == FALSE){
+          clmax = cl
+          brtemp = br
+          while (brtemp < clmax) {
+            brtemp = brtemp +1 
+            print(brtemp)
+            print(clmax)
+            print(last)
+            list2 = list("ggdf" = list2$ggdf, "dfsum" = list2$dfsum,"list" = list2$list, "listn" = list2$listn, "udata" = list2$udata,"permat"= list2$permat, "persim" = list2$persim, "br" = brtemp, "cl" = list2$cl, "met" = list2$met, "ep"= list2$ep, "clep" = list2$clep,"nn" = list2$nn, "sumper" = list2$sumper, "sumper2" = list2$sumper2, "ela" = list2$ela, "cel" = list2$cel,"endper" = list2$endper, "last" = last)
+            list2 = Matrices(list2,TRUE,let,sim,d,algo,algocol)
+          }
+        }
         return(list2)  # End of the programm, returning the final list
       }
     }
   }else{
     if (sumper2 > endper){
+      last = last+1
+      if (last == 1 && leaf == FALSE){
+        clmax = cl
+        brtemp = br
+        while (brtemp < clmax) {
+          brtemp = brtemp +1 
+          print(brtemp)
+          print(clmax)
+          print(last)
+          list2 = list("ggdf" = list2$ggdf, "dfsum" = list2$dfsum,"list" = list2$list, "listn" = list2$listn, "udata" = list2$udata,"permat"= list2$permat, "persim" = list2$persim, "br" = brtemp, "cl" = list2$cl, "met" = list2$met, "ep"= list2$ep, "clep" = list2$clep,"nn" = list2$nn, "sumper" = list2$sumper, "sumper2" = list2$sumper2, "ela" = list2$ela, "cel" = list2$cel,"endper" = list2$endper, "last" = last)
+          list2 = Matrices(list2,TRUE,let,sim,d,algo,algocol)
+        }
+      }
       return(list2)  # End of the programm, returning the final list
     }
   }
   vv = length(udata[udata$clusters == br,]$AA.JUNCTION)
   dfsum[nrow(dfsum) + 1,] = c(sumper,sumper2,br,vv)
-  result2 = list("dfsum" = dfsum,"list" = list2$list, "listn" = list2$listn, "udata" = list2$udata,"permat"= list2$permat, "persim" = list2$persim, "br" = list2$br, "cl" = list2$cl, "met" = list2$met, "ep"= list2$ep, "clep" = list2$clep,"nn" = nn, "sumper" = sumper, "sumper2" = sumper2, "ela" = list2$ela, "cel" = list2$cel,"endper" = list2$endper)
+  result2 = list("ggdf" = list2$ggdf, "dfsum" = dfsum,"list" = list2$list, "listn" = list2$listn, "udata" = list2$udata,"permat"= list2$permat, "persim" = list2$persim, "br" = list2$br, "cl" = list2$cl, "met" = list2$met, "ep"= list2$ep, "clep" = list2$clep,"nn" = nn, "sumper" = sumper, "sumper2" = sumper2, "ela" = list2$ela, "cel" = list2$cel,"endper" = list2$endper, "last" = last)
   if ( leaf == TRUE){
     nn = FALSE
-    result2 = list("dfsum" = dfsum,"list" = list2$list, "listn" = list2$listn, "udata" = list2$udata,"permat"= list2$permat, "persim" = list2$persim, "br" = list2$br, "cl" = list2$cl, "met" = list2$met, "ep"= list2$ep, "clep" = list2$clep,"nn" = nn, "sumper" = sumper, "sumper2" = sumper2, "ela" = list2$ela, "cel" = list2$cel,"endper" = list2$endper)
+    result2 = list("ggdf" = list2$ggdf, "dfsum" = dfsum,"list" = list2$list, "listn" = list2$listn, "udata" = list2$udata,"permat"= list2$permat, "persim" = list2$persim, "br" = list2$br, "cl" = list2$cl, "met" = list2$met, "ep"= list2$ep, "clep" = list2$clep,"nn" = nn, "sumper" = sumper, "sumper2" = sumper2, "ela" = list2$ela, "cel" = list2$cel,"endper" = list2$endper, "last" = last)
     return(result2)
   }else{
     Choice(result2,let,sim,d,algo,algocol)
@@ -90,6 +118,8 @@ Finish <- function(list2,leaf,let,sim,d,algo,algocol){
 # Function Choice choose which matrix cell will be used for the division of the data 
 Choice <- function(list3,let,sim,d,algo,algocol){
   nn = list3$nn
+  br = list3$br
+  cl = list3$cl
   if(nn == TRUE || (algo == "Similarity") ){
     permat = list3$persim # If sumper < endper% we want to check only the persim matrix
   }else{
@@ -103,7 +133,16 @@ Choice <- function(list3,let,sim,d,algo,algocol){
     cel = which(permat[,(algocol + 1):ncol(permat)] == max(permat[,(algocol + 1):ncol(permat)][permat[,(algocol + 1):ncol(permat)]!=max(permat[,(algocol + 1):ncol(permat)])]), arr.ind = TRUE) # The desired cell
     poss = max(permat[,(algocol + 1):ncol(permat)][permat[,(algocol + 1):ncol(permat)]!=max(permat[,(algocol + 1):ncol(permat)])])
   }
+  
   if(poss == 0){
+    clmax = cl
+    brtemp = br
+    while (brtemp < clmax) {
+      brtemp = brtemp +1 
+      print(brtemp)
+      list3 = list("ggdf" = list3$ggdf, "dfsum" = list3$dfsum,"list" = list3$list, "listn" = list3$listn, "udata" = list3$udata,"permat"= list3$permat, "persim" = list3$persim, "br" = brtemp, "cl" = list3$cl, "met" = list3$met, "ep"= list3$ep, "clep" = list3$clep,"nn" = list3$nn, "sumper" = list3$sumper, "sumper2" = list3$sumper2, "ela" = list3$ela, "cel" = list3$cel,"endper" = list3$endper, "last" = list3$last)
+      list3 = Matrices(list3,TRUE,let,sim,d,algo,algocol)
+    }
     return(list3)
   }
   
@@ -149,13 +188,14 @@ Choice <- function(list3,let,sim,d,algo,algocol){
     }
   }
   nn = FALSE # Return nn in it's original value 
-  result3 = list("dfsum" = list3$dfsum,"list" = list3$list, "listn" = list3$listn, "udata" = list3$udata,"permat"= list3$permat, "persim" = list3$persim, "br" = list3$br, "cl" = list3$cl, "met" = list3$met, "ep"= list3$ep, "clep" = list3$clep,"nn" = nn, "sumper" = list3$sumper, "sumper2" = list3$sumper2, "ela" = ela, "cel" = cel,"endper" = list3$endper)
+  result3 = list("ggdf" = list3$ggdf, "dfsum" = list3$dfsum,"list" = list3$list, "listn" = list3$listn, "udata" = list3$udata,"permat"= list3$permat, "persim" = list3$persim, "br" = list3$br, "cl" = list3$cl, "met" = list3$met, "ep"= list3$ep, "clep" = list3$clep,"nn" = nn, "sumper" = list3$sumper, "sumper2" = list3$sumper2, "ela" = ela, "cel" = cel,"endper" = list3$endper, "last" = list3$last)
   Divide(result3,let,sim,d,algo,algocol)
 }
 
 
 # Function Divide divide the data into 2 new clusters and updates the column with the right level 
 Divide <- function(list4,let,sim,d,algo,algocol){
+  ggdf = list4$ggdf
   udata = list4$udata
   br = list4$br
   cel = list4$cel
@@ -163,6 +203,7 @@ Divide <- function(list4,let,sim,d,algo,algocol){
   cl = list4$cl
   met = list4$met
   ep = list4$ep
+  
   if (met == 0){ # If we need a new level, then we create a new column with its name (level.ep)
     udata$temp = NA
     names(udata)[length(udata)] = sprintf('level.%d', ep)
@@ -170,9 +211,15 @@ Divide <- function(list4,let,sim,d,algo,algocol){
   
   if (algo == "Identity"){
     x1 = str_which(str_detect(str_sub(udata[udata$clusters == br,]$AA.JUNCTION,(cel[ela,2]+algocol),(cel[ela,2]+algocol)), let[cel[ela,1]]), "TRUE")
+    mk = length(x1)
+    cltp = cl + 1
+    ggdf[nrow(ggdf) + 1,] = c(cltp,mk)
     y1 = udata[udata$clusters == br,]$AA.JUNCTION
     z1 = y1[x1]
     x2 = str_which(str_detect(str_sub(udata[udata$clusters == br,]$AA.JUNCTION,(cel[ela,2]+algocol),(cel[ela,2]+algocol)), let[cel[ela,1]]), "FALSE")
+    mk = length(x2)
+    cltp = cl + 2
+    ggdf[nrow(ggdf) + 1,] = c(cltp,mk)
     y2 = udata[udata$clusters == br,]$AA.JUNCTION
     z2 = y2[x2]
     for(i in 1:length(z1)){
@@ -185,9 +232,15 @@ Divide <- function(list4,let,sim,d,algo,algocol){
   }else{
     strings.to.find = unlist(sim[cel[ela,1]])
     x1 = str_which(str_detect(str_sub(udata[udata$clusters == br,]$AA.JUNCTION,(cel[ela,2]+algocol),(cel[ela,2]+algocol)), str_c(strings.to.find, collapse="|")), "TRUE")
+    mk = length(x1)
+    cltp = cl + 1
+    ggdf[nrow(ggdf) + 1,] = c(cltp,mk)
     y1 = udata[udata$clusters == br,]$AA.JUNCTION
     z1 = y1[x1]
     x2 = str_which(str_detect(str_sub(udata[udata$clusters == br,]$AA.JUNCTION,(cel[ela,2]+algocol),(cel[ela,2]+algocol)), str_c(strings.to.find, collapse="|")), "FALSE")
+    mk = length(x2)
+    cltp = cl + 2
+    ggdf[nrow(ggdf) + 1,] = c(cltp,mk)
     y2 = udata[udata$clusters == br,]$AA.JUNCTION
     z2 = y2[x2]
     for(i in 1:length(z1)){
@@ -199,7 +252,7 @@ Divide <- function(list4,let,sim,d,algo,algocol){
     udata[udata$clusters == br,]$clusters <- ifelse(str_detect(str_sub(udata[udata$clusters == br,]$AA.JUNCTION,(cel[ela,2]+algocol),(cel[ela,2]+algocol)), str_c(strings.to.find, collapse="|")), cl+1 ,cl+2) 
   }
   
-  result4 = list("dfsum" = list4$dfsum,"list" = list4$list, "listn" = list4$listn, "udata" = udata,"permat"= list4$permat, "persim" = list4$persim, "br" = list4$br, "cl" = list4$cl, "met" = list4$met, "ep"= list4$ep, "clep" = list4$clep,"nn" = list4$nn, "sumper" = list4$sumper, "sumper2" = list4$sumper2, "ela" = list4$ela, "cel" = list4$cel,"endper" = list4$endper)
+  result4 = list("ggdf" = ggdf,"dfsum" = list4$dfsum,"list" = list4$list, "listn" = list4$listn, "udata" = udata,"permat"= list4$permat, "persim" = list4$persim, "br" = list4$br, "cl" = list4$cl, "met" = list4$met, "ep"= list4$ep, "clep" = list4$clep,"nn" = list4$nn, "sumper" = list4$sumper, "sumper2" = list4$sumper2, "ela" = list4$ela, "cel" = list4$cel,"endper" = list4$endper, "last" = list4$last)
   Control(result4,let,sim,d,algo,algocol)
 }
 
@@ -219,7 +272,7 @@ Control <- function(list5,let,sim,d,algo,algocol){
   br = br + 1 # Increase the branch by 1
   cl = cl + 2 # Increase the cluster by 2
   met = met + 2 # Increase the counter by 2
-  list5 = list("dfsum" = list5$dfsum,"list" = list5$list, "listn" = list5$listn, "udata" = list5$udata,"permat"= list5$permat, "persim" = list5$persim, "br" = br, "cl" = cl, "met" = met, "ep"= ep, "clep" = clep,"nn" = list5$nn, "sumper" = list5$sumper, "sumper2" = list5$sumper2, "ela" = list5$ela, "cel" = list5$cel,"endper" = list5$endper)
+  list5 = list("ggdf" = list5$ggdf, "dfsum" = list5$dfsum,"list" = list5$list, "listn" = list5$listn, "udata" = list5$udata,"permat"= list5$permat, "persim" = list5$persim, "br" = br, "cl" = cl, "met" = met, "ep"= ep, "clep" = clep,"nn" = list5$nn, "sumper" = list5$sumper, "sumper2" = list5$sumper2, "ela" = list5$ela, "cel" = list5$cel,"endper" = list5$endper, "last" = list5$last)
   if( ((clep[br-1] < clep[br]) && (sum(clep == clep[br]) != (2^clep[br]))) == TRUE && (length(which(udata$clusters == br)) > 2) ){ # If the next branch is in the next level
     met = geomSeq(1,2,1,50)[ep+1]
   }
@@ -239,13 +292,13 @@ Control <- function(list5,let,sim,d,algo,algocol){
       br = br + 1
       met = met +2 
     }
-    list5 = list("dfsum" = list5$dfsum,"list" = list5$list, "listn" = list5$listn, "udata" = list5$udata,"permat"= list5$permat, "persim" = list5$persim, "br" = br, "cl" = cl, "met" = met, "ep"= ep, "clep" = clep,"nn" = list5$nn, "sumper" = list5$sumper, "sumper2" = list5$sumper2, "ela" = list5$ela, "cel" = list5$cel,"endper" = list5$endper)
+    list5 = list("ggdf" = list5$ggdf, "dfsum" = list5$dfsum,"list" = list5$list, "listn" = list5$listn, "udata" = list5$udata,"permat"= list5$permat, "persim" = list5$persim, "br" = br, "cl" = cl, "met" = met, "ep"= ep, "clep" = clep,"nn" = list5$nn, "sumper" = list5$sumper, "sumper2" = list5$sumper2, "ela" = list5$ela, "cel" = list5$cel,"endper" = list5$endper, "last" = list5$last)
   }
   if( met == geomSeq(1,2,1,50)[ep+1]){ # When the counter reaches the end value (geometric sequence) we increase the level counter
     met = 0
     ep = ep + 1
   }
-  result5 = list("dfsum" = list5$dfsum,"list" = list5$list, "listn" = list5$listn, "udata" = list5$udata,"permat"= list5$permat, "persim" = list5$persim, "br" = br, "cl" = cl, "met" = met, "ep"= ep, "clep" = clep,"nn" = list5$nn, "sumper" = list5$sumper, "sumper2" = list5$sumper2, "ela" = list5$ela, "cel" = list5$cel,"endper" = list5$endper)
+  result5 = list("ggdf" = list5$ggdf, "dfsum" = list5$dfsum,"list" = list5$list, "listn" = list5$listn, "udata" = list5$udata,"permat"= list5$permat, "persim" = list5$persim, "br" = br, "cl" = cl, "met" = met, "ep"= ep, "clep" = clep,"nn" = list5$nn, "sumper" = list5$sumper, "sumper2" = list5$sumper2, "ela" = list5$ela, "cel" = list5$cel,"endper" = list5$endper, "last" = list5$last)
   Matrices(result5,FALSE,let,sim,d,algo,algocol)
 }
 

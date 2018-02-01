@@ -113,7 +113,7 @@ function(request) {navbarPage(
       br(),
       br(),
       selectInput("algorithm_type", "Select Identity or Similarity", choices = c("Identity","Similarity")),
-      numericInput("column_num", "Select level to show:", 0,  min = 0, max = 19, width="140px"),
+      numericInput("column_num", "Select columns to exclude from the algorithm [0 - value]:", 0,  min = 0, max = 20, width="140px"),
       br(),
       
       actionButton("begin", "Run", 
@@ -127,228 +127,75 @@ function(request) {navbarPage(
     textOutput("message"),
     
     br(),
-    br(),
     
     actionButton("Tree", "Show Tree", 
                  style="color: #fff; background-color: #5F021F; border-color: #fff"),
+    uiOutput("g1"),
     
-    conditionalPanel(
-      condition = "input.Tree % 2 == 1",
-      br(),
-      br(),
-      numericInput("tree_level", "Select max level of the tree:", 5,  min = 1, max = 19, width="140px"),
-      br(),
-      grVizOutput("tre", width = "1500px", height = "1000px")
-    ),
-
-    br(),
     br(),
     
     actionButton("Coltree", "Show Collapsible Tree", 
                  style="color: #fff; background-color: #5F021F; border-color: #fff"),
+    uiOutput("g2"),
     
-    conditionalPanel(
-      condition = "input.Coltree % 2 == 1",
-      br(),
-      br(),
-      collapsibleTreeOutput("coltre", width = "1500px", height = "1000px")
-    ),
-    
-    br(),
     br(),
     
     actionButton("Logo", "Show Logo", 
                  style="color: #fff; background-color: #5F021F; border-color: #fff"),
     
-    conditionalPanel(
-      condition = "input.Logo % 2 == 1",
-      br(),
-      br(),
-      numericInput("logo_level", "Select level to show:", 5,  min = 1, max = 19, width="140px"),
-      br(),
-      plotOutput("logolev"),
-      br(),
-      downloadButton("downloadLogoLevel")  
-    ),
+    uiOutput("g3"),
+    uiOutput("g4"),
     
-    conditionalPanel(
-      condition = "input.Logo % 2 == 1",
-      br(),
-      br(),
-      numericInput("logo_cluster", "Select cluster to show:", 5,  min = 1, max = 166, width="140px"),
-      br(),
-      plotOutput("logocl"),
-      br(),
-      downloadButton("downloadLogoCluster")
-    ),
-    
-    
-    br(),
     br(),
     
     actionButton("Barplot", "Show Barplot", 
                  style="color: #fff; background-color: #5F021F; border-color: #fff"),
     
-    conditionalPanel(
-      condition = "input.Barplot % 2 == 1",
-      br(),
-      br(),
-      numericInput("bar_level", "Select level to show:", 5,  min = 1, max = 18, width="140px"),
-      selectInput("barl_style", "Select Identity or Similarity", choices = c("Identity","Similarity")),
-      br(),
-      plotOutput("barlev", width = "1500px", height = "1000px"),
-      downloadButton("downloadBarLevel")
-    ),
+    uiOutput("g5"),
+    uiOutput("g6"),
     
-    conditionalPanel(
-      condition = "input.Barplot % 2 == 1",
-      br(),
-      br(),
-      numericInput("bar_cluster", "Select cluster to show:", 5,  min = 1, max = 163, width="140px"),
-      selectInput("barcl_style", "Select Identity or Similarity", c("Identity","Similarity")),
-      br(),
-      plotOutput("barcl",width = "600px", height = "350px"),
-      downloadButton("downloadBarCluster")
-    ),
-    
-    br(),
     br(),
     
     actionButton("Amino", "Show Amino Elements", 
                  style="color: #fff; background-color: #5F021F; border-color: #fff"),
     
-    conditionalPanel(
-      condition = "input.Amino % 2 == 1",
-      br(),
-      br(),
-      numericInput("amino_level", "Select level to show:", 5,  min = 1, max = 19, width="140px"),
-      br(),
-      tableOutput('aminolev')
-    ),
+    uiOutput("g7"),
+    uiOutput("g8"),
     
-    conditionalPanel(
-      condition = "input.Amino % 2 == 1",
-      br(),
-      br(),
-      numericInput("amino_cluster", "Select cluster to show:", 5,  min = 0, max = 166, width="140px"),
-      br(),
-      tableOutput('aminocl')
-    ),
-    
-    br(),
     br(),
     
     actionButton("AminoIde", "Show Amino Cluster Identity and Similarity", 
                  style="color: #fff; background-color: #5F021F; border-color: #fff"),
     
-    conditionalPanel(
-      condition = "input.AminoIde % 2 == 1",
-      br(),
-      tableOutput('pin'),
-      br(),
-      downloadButton("downloadallEmPin", "Download")
-    ),
-    
-    conditionalPanel(
-      condition = "input.AminoIde % 2 == 1",
-      br(),
-      br(),
-      numericInput("aminoide_level", "Select level to show:", 5,  min = 1, max = 19, width="140px"),
-      selectInput("aminoide_lever", "Select Identity or Similarity", choices = c("Identity","Similarity")),
-      br(),
-      tableOutput('idenaminolev')
-    ),
-    
-    conditionalPanel(
-      condition = "input.AminoIde % 2 == 1",
-      br(),
-      br(),
-      numericInput("aminoide_cluster", "Select cluster to show:", 5,  min = 1, max = 166, width="140px"),
-      selectInput("aminoide_clver", "Select Identity or Similarity", choices = c("Identity","Similarity")),
-      br(),
-      tableOutput('idenaminocl')
-    ),
-    
-    br(),
+    uiOutput("g9"),
+    uiOutput("g10"),
+    uiOutput("g11"),
+  
     br(),
     
     actionButton("ComLetters", "Show Common Letters", 
                  style="color: #fff; background-color: #5F021F; border-color: #fff"),
+    uiOutput("g12"),
+    uiOutput("g13"),
     
-    conditionalPanel(
-      condition = "input.ComLetters % 2 == 1",
-      br(),
-      br(),
-      numericInput("opt1_level", "Select level to show:", 5,  min = 1, max = 19, width="140px"),
-      br(),
-      textOutput('opt1lev')
-    ),
-    
-    conditionalPanel(
-      condition = "input.ComLetters % 2 == 1",
-      br(),
-      br(),
-      numericInput("opt1_cluster", "Select cluster to show:", 5,  min = 0, max = 166, width="140px"),
-      br(),
-      textOutput('opt1cl')
-    ),
-    
-    br(),
     br(),
     
     actionButton("ComGroups", "Show Common Similarity Groups", 
                  style="color: #fff; background-color: #5F021F; border-color: #fff"),
-    
-    conditionalPanel(
-      condition = "input.ComGroups % 2 == 1",
-      br(),
-      br(),
-      numericInput("opt2_level", "Select level to show:", 5,  min = 1, max = 19, width="140px"),
-      br(),
-      textOutput('opt2lev')
-    ),
-    
-    conditionalPanel(
-      condition = "input.ComGroups % 2 == 1",
-      br(),
-      br(),
-      numericInput("opt2_cluster", "Select cluster to show:", 5,  min = 1, max = 166, width="140px"),
-      br(),
-      textOutput('opt2cl')
-    ),
-    
-    br(),
+    uiOutput("g14"),
+    uiOutput("g15"),
+ 
     br(),
     
     actionButton("Identity", "Show Identity and Similarity Plot", 
                  style="color: #fff; background-color: #5F021F; border-color: #fff"),
+    uiOutput("g16"),
     
-    conditionalPanel(
-      condition = "input.Identity % 2 == 1",
-      selectInput("ident", "Select Identity or Similarity", choices = c("Identity","Similarity")),
-      br(),
-      plotOutput('idplot'),
-      downloadButton("downloadIdentityPlot")
-    ),
-    
-    br(),
     br(),
     
     actionButton("Network", "Show Network", 
                  style="color: #fff; background-color: #5F021F; border-color: #fff"),
-    
-    conditionalPanel(
-      condition = "input.Network % 2 == 1",
-      br(),
-      br(),
-      numericInput("net_level", "Select level to show:", 2,  min = 0, max = 18, width="140px"),
-      selectInput("net_style", "Select Whole or Partial", choices = c("whole","partial")),
-      selectInput("thr_style", "Select Distance, String Similarity or Final distance", choices = c("Distance","StrSimilarity","FinalDis")),
-      numericInput("thr_value", "Select threshold value:", 2,  min = 1, max = 18, width="140px"),
-      br(),
-      plotOutput('net', width = "1500px", height = "1000px")
-      #downloadButton("downloadBarLevel")
-    )
+    uiOutput("g17")
 
   )
   )
