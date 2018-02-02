@@ -1,9 +1,16 @@
 #install.packages("shiny")
-library(shiny)
-library(shinyFiles)
-library(shinyjs)
-library("shinyBS")
-library("DT")
+#library(shiny)
+#library(shinyFiles)
+#library(shinyjs)
+#library("shinyBS")
+#library("DT")
+
+#library(shinyFiles)
+#library("shinyBS")
+#library("DT")
+#library(dplyr)
+#library(plotly)
+#library(xtable)
 
 #install.packages("stringr")
 #install.packages("dplyr")
@@ -16,29 +23,39 @@ library("DT")
 #install.packages("collapsibleTree")
 #install.packages("data.tree")
 #install.packages("DiagrammeR")
-#install.packages('stringdist')
+#install.packages("stringdist")
 #install.packages("igraph")
 #install.packages("plsgenomics")
 #install.packages("networkD3")
 #install.packages('ndtv', dependencies=T)
 #install.packages("htmlwidget")
-library('networkD3')
-library('stringdist')
-library("plsgenomics")
-library("igraph")
-library('network')
-library('ndtv')
-library("stringr")
-library("dplyr")
-library("entropy")
-library("ggplot2")
-library("ggseqlogo")
-library("gridExtra")
-library("cluster")
-library("seqinr")
-library("DiagrammeR")
-library("collapsibleTree")
-library("data.tree")
+ipak <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+packages <- c("stringr","dplyr","entropy","ggplot2","ggseqlogo","gridExtra","cluster","seqinr","collapsibleTree","data.tree","DiagrammeR","stringdist","igraph","networkD3","plsgenomics","shiny","shinyFiles","shinyjs","shinyBS","DT","plotly","xtable")
+ipak(packages)
+#install.packages(c("stringr","dplyr","entropy","ggplot2","ggseqlogo","gridExtra","cluster","seqinr","collapsibleTree","data.tree","DiagrammeR","stringdist","igraph","networkD3","htmlwidget","shiny"))
+#require(c("stringr","dplyr","entropy","ggplot2","ggseqlogo","gridExtra","cluster","seqinr","collapsibleTree","data.tree","DiagrammeR","stringdist","igraph","networkD3","htmlwidget","shiny","shinyFiles","shinyjs","shinyBS","DT","plotly","xtable"),quietly = FALSE)
+#library('networkD3')
+#library('stringdist')
+#library("plsgenomics")
+#library("igraph")
+#library('network')
+#library('ndtv')
+#library("stringr")
+#library("dplyr")
+#library("entropy")
+#library("ggplot2")
+#library("ggseqlogo")
+#library("gridExtra")
+#library("cluster")
+#library("seqinr")
+#library("DiagrammeR")
+#library("collapsibleTree")
+#library("data.tree")
 #library("htmlwidget")
 #jsResetCode <- "shinyjs.reset = function() {history.go(0)}"
 
@@ -117,86 +134,47 @@ function(request) {navbarPage(
       br(),
       
       actionButton("begin", "Run", 
-                   style="color: #fff; background-color: #179B12; border-color: #fff"),
+                   style="color: #fff; background-color: #179B12; border-color: #fff")
       
-      conditionalPanel(
-        condition = "input.begin % 2 == 1"
-      )
     ),
     
-    textOutput("message"),
+    conditionalPanel(
+      condition = "input.begin% 2 == 1",
+       withSpinner(textOutput("message"),proxy.height = "50px")),
     
     br(),
     
-    actionButton("Tree", "Show Tree", 
-                 style="color: #fff; background-color: #5F021F; border-color: #fff"),
-    uiOutput("g1"),
     
-    br(),
-    
-    actionButton("Coltree", "Show Collapsible Tree", 
-                 style="color: #fff; background-color: #5F021F; border-color: #fff"),
-    uiOutput("g2"),
-    
-    br(),
-    
-    actionButton("Logo", "Show Logo", 
-                 style="color: #fff; background-color: #5F021F; border-color: #fff"),
-    
-    uiOutput("g3"),
-    uiOutput("g4"),
-    
-    br(),
-    
-    actionButton("Barplot", "Show Barplot", 
-                 style="color: #fff; background-color: #5F021F; border-color: #fff"),
-    
-    uiOutput("g5"),
-    uiOutput("g6"),
-    
-    br(),
-    
-    actionButton("Amino", "Show Amino Elements", 
-                 style="color: #fff; background-color: #5F021F; border-color: #fff"),
-    
-    uiOutput("g7"),
-    uiOutput("g8"),
-    
-    br(),
-    
-    actionButton("AminoIde", "Show Amino Cluster Identity and Similarity", 
-                 style="color: #fff; background-color: #5F021F; border-color: #fff"),
-    
-    uiOutput("g9"),
-    uiOutput("g10"),
-    uiOutput("g11"),
-  
-    br(),
-    
-    actionButton("ComLetters", "Show Common Letters", 
-                 style="color: #fff; background-color: #5F021F; border-color: #fff"),
-    uiOutput("g12"),
-    uiOutput("g13"),
-    
-    br(),
-    
-    actionButton("ComGroups", "Show Common Similarity Groups", 
-                 style="color: #fff; background-color: #5F021F; border-color: #fff"),
-    uiOutput("g14"),
-    uiOutput("g15"),
- 
-    br(),
-    
-    actionButton("Identity", "Show Identity and Similarity Plot", 
-                 style="color: #fff; background-color: #5F021F; border-color: #fff"),
-    uiOutput("g16"),
-    
-    br(),
-    
-    actionButton("Network", "Show Network", 
-                 style="color: #fff; background-color: #5F021F; border-color: #fff"),
-    uiOutput("g17")
-
+    fluidPage( tabsetPanel(
+      tabPanel( actionButton("Tree", "Show Tree", style="color: #fff; background-color: #5F021F; border-color: #fff"),
+                uiOutput("g1")),
+      tabPanel( actionButton("Coltree", "Show Collapsible Tree", style="color: #fff; background-color: #5F021F; border-color: #fff"),
+                uiOutput("g2")),
+      tabPanel( actionButton("Logo", "Show Logo", style="color: #fff; background-color: #5F021F; border-color: #fff"),
+                uiOutput("g3"),
+                uiOutput("g4")),
+      tabPanel( actionButton("Barplot", "Show Barplot", style="color: #fff; background-color: #5F021F; border-color: #fff"),
+                uiOutput("g5"),
+                uiOutput("g6")),
+      tabPanel( actionButton("Amino", "Show Amino Elements", style="color: #fff; background-color: #5F021F; border-color: #fff"),
+                uiOutput("g7"),
+                uiOutput("g8")),
+      tabPanel( actionButton("AminoIde", "Show Amino Cluster Identity and Similarity", style="color: #fff; background-color: #5F021F; border-color: #fff"),
+                uiOutput("g9"),
+                uiOutput("g10"),
+                uiOutput("g11")),
+      tabPanel( actionButton("ComLetters", "Show Common Letters", style="color: #fff; background-color: #5F021F; border-color: #fff"),
+                uiOutput("g12"),
+                uiOutput("g13")),
+      tabPanel( actionButton("ComGroups", "Show Common Similarity Groups", style="color: #fff; background-color: #5F021F; border-color: #fff"),
+                uiOutput("g14"),
+                uiOutput("g15")),
+      tabPanel( actionButton("Identity", "Show Identity and Similarity Plot", style="color: #fff; background-color: #5F021F; border-color: #fff"),
+                uiOutput("g16")),
+      tabPanel( actionButton("Network", "Show Network", style="color: #fff; background-color: #5F021F; border-color: #fff"),
+                uiOutput("g17"))
+      
+      ))
   )
   )
   

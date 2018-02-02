@@ -1,9 +1,4 @@
-library(shinyFiles)
-library("shinyBS")
-library("DT")
-library(dplyr)
-library(plotly)
-library(xtable)
+
 
 
 source("helpers.R")
@@ -18,6 +13,9 @@ shinyServer(
     sim = list("F","W",c("A","I","L","V"),c("M","C"),"P","G","Y",c("T","S"),c("H","K","R"),c("E","D"),c("Q","N"))
     # Naming the group of similarities
     names(sim) = c("F","W","Al","Su","P","G","Y","Hy","Ba","Ac","Am")
+    altsim = list("F","W",c("A","I","L","V"),c("M","C"),"P","G","Y",c("T","S"),c("H","K","R"),c("E","D"),c("Q","N"))
+    # Naming the group of similarities
+    names(altsim) = c("f","w","a","s","p","g","y","h","b","c","m")
     # A table with the letters
     let = c("A","C","D","E","F","G","H","I","K","L","M","N","P","Q","R","S","T","V","W","Y") # The letters matrix
     # An empty vector wich will store the level for every cluster
@@ -57,6 +55,7 @@ shinyServer(
     
     observeEvent(is.null(input$begin),{
       if (is.null(input$Dataset)) return()
+      hide("begin")
       udata=read.csv(paste0("data/",input$Dataset), header = TRUE, sep = ";")
       udata$AA.JUNCTION = as.character(udata$AA.JUNCTION)
       udata$clusters = 0 # Initialiaze the column clusters with 0
@@ -90,10 +89,10 @@ shinyServer(
       mm = 1
     
       output$message <- renderText({
-        if(is.null(mm)) return()
+        if(is.null(mm)) return("sdasad")
         "Data available from now on"
       })
-    
+      
       output$tre <- renderGrViz({
         if (is.null(dir()) | is.null(input$Dataset)) return()
         Den(input$tree_level,df,lastlist)
@@ -199,12 +198,12 @@ shinyServer(
     
       output$opt2lev <- renderText({
         if (is.null(dir()) | is.null(input$Dataset)) return()
-        Opt2(AminoLev(input$opt2_level,lastlist,df,Clus),sim)
+        Opt2(AminoLev(input$opt2_level,lastlist,df,Clus),sim,FALSE,altsim)
       })
     
       output$opt2cl <- renderText({
         if (is.null(dir()) | is.null(input$Dataset)) return()
-        Opt2(AminoCl(input$opt2_cluster,lastlist,df),sim)
+        Opt2(AminoCl(input$opt2_cluster,lastlist,df),sim,FALSE,altsim)
       })
     
       output$idplot <- renderPlot({
@@ -222,7 +221,7 @@ shinyServer(
       
       output$net <- renderPlot({
         if (is.null(dir()) | is.null(input$Dataset)) return()
-        Netw(input$net_level,input$thr_value,input$thr_style,input$net_style,df,lastlist,Clus)
+        Netw(input$net_level,input$thr_value,input$thr_style,input$net_style,df,lastlist,Clus,sim,altsim)
       })
       
     output$g1 <- renderUI({

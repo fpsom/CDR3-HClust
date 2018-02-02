@@ -482,7 +482,7 @@ Opt <- function(df){
 
 
 # A function which visualize the sequences of a data frame using similarity groups (i.e. "A _ _ _ _ K Am _ Ba _ Ac _ Y Y Y _ _ _ T _")
-Opt2 <- function(df,sim){
+Opt2 <- function(df,sim,alt,altsim){
   xar <- matrix(0,nrow=1, ncol=str_length(df$AA.JUNCTION[1]))
   for (i in 1:str_length(df$AA.JUNCTION[1])) {
     f <- table(str_sub(df$AA.JUNCTION,i,i))
@@ -496,7 +496,11 @@ Opt2 <- function(df,sim){
         y = y && str_detect(sim[d],names(f[j]))
       }
       if( y == TRUE){
-        xar[i] = names(sim[d])
+        if(alt == TRUE){
+          xar[i] = names(altsim[d])
+        }else{
+          xar[i] = names(sim[d])
+        }
       } 
     }
     
@@ -583,7 +587,7 @@ EmPin <- function(lastlist,Clus,dfsd){
   dfsd
 }
 
-Netw <- function(lev,thr,thrt,netyp,df,lastlist,Clus){
+Netw <- function(lev,thr,thrt,netyp,df,lastlist,Clus,sim,altsim){
   df = df[ do.call( order , df[ , match(  colnames(df[str_which(names(df), "level.")]) , names(df) ) ]  ) , ]
   df_args <- c(df[str_which(names(df), "level.")], sep="/")
   if(lev == max(lastlist$clep)){
@@ -622,6 +626,7 @@ Netw <- function(lev,thr,thrt,netyp,df,lastlist,Clus){
   bo = which(lastlist$clep == lev)
   ffg = matrix(NA,nrow = max(bo)+1,ncol = (max(bo)+1)) # the distance between 2 Nodes
   ffg2 = matrix(NA,nrow = max(bo)+1,ncol = (max(bo)+1)) # the string distance between 2 Nodes (string from function Opt())
+  ffg2sim = matrix(NA,nrow = max(bo)+1,ncol = (max(bo)+1))
   ffg3 = matrix(NA,nrow = max(bo)+1,ncol = (max(bo)+1)) # the final distance combining ffg and ffg2
   
   # anw trigwnikos
@@ -629,6 +634,7 @@ Netw <- function(lev,thr,thrt,netyp,df,lastlist,Clus){
     tempN1 = FindNode(xN,(sprintf("%d", i-1)))
     tempN1 = tempN1$path
     temp2N1 = Opt(AminoCl(i-1,lastlist,df))
+    temp3N1 = Opt2(AminoCl(i-1,lastlist,df),sim,TRUE,altsim)
     for(j in i:(max(bo)+1)){          # max(df$clusters)+1
       tempN2 = FindNode(xN,(sprintf("%d", j-1)))
       tempN2 = tempN2$path
@@ -639,9 +645,13 @@ Netw <- function(lev,thr,thrt,netyp,df,lastlist,Clus){
       ffg[i,j]= d1 + d2
       temp2N2 = Opt(AminoCl(j-1,lastlist,df))
       temp2N2 = str_replace_all(temp2N2,"_"," ")
+      temp3N2 = Opt2(AminoCl(j-1,lastlist,df),sim,TRUE,altsim)
+      temp3N2 = str_replace_all(temp3N2,"_"," ")
       ffg2[i,j] = stringdist(temp2N1,temp2N2,method = "lv" )
+      ffg2sim[i,j] = stringdist(temp3N1,temp3N2,method = "lv" )
       if( i == j ){
         ffg2[i,j] = str_length(lastlist$udata$AA.JUNCTION[1]) #gia na mhn fainontai velakia pisw
+        ffg2sim[i,j] = str_length(lastlist$udata$AA.JUNCTION[1])
       }
     }
   }
@@ -649,7 +659,7 @@ Netw <- function(lev,thr,thrt,netyp,df,lastlist,Clus){
   #find max
   ma =max(na.omit(as.vector(ffg)))
   ffg[which(ffg == 0)] = ma #gia na mhn fainontai velakia pisw
-  ffg3 = 0.125 * (str_length(lastlist$udata$AA.JUNCTION[1]) - ffg2) + 0.125 * (ma - ffg) * (str_length(lastlist$udata$AA.JUNCTION[1]) / ma)
+  ffg3 = 0.125 * (str_length(lastlist$udata$AA.JUNCTION[1]) - ffg2) + 0.125 * (str_length(lastlist$udata$AA.JUNCTION[1]) - ffg2sim) +0.125 * (ma - ffg) * (str_length(lastlist$udata$AA.JUNCTION[1]) / ma)
   
   if(thrt == "Distance"){
     thrtyp = ffg
