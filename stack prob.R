@@ -1,27 +1,25 @@
-library('networkD3')
-library('stringdist')
-library("plsgenomics")
-library("igraph")
-library('network')
-library('ndtv')
-library("stringr")
-library("dplyr")
-library("entropy")
-library("ggplot2")
-library("ggseqlogo")
-library("gridExtra")
-library("cluster")
-library("seqinr")
-library("DiagrammeR")
-library("collapsibleTree")
-library("data.tree")
+ipak <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+packages <- c("stringr","dplyr","entropy","ggplot2","ggseqlogo","gridExtra","cluster","seqinr","collapsibleTree","data.tree","DiagrammeR","stringdist","igraph","networkD3","plsgenomics","shinycssloaders","shiny","shinyFiles","shinyjs","shinyBS","DT","plotly","xtable","tictoc")
+ipak(packages)
 
-data <- read.csv(file.choose(), header = TRUE, sep = ";")
+cdr3_generator <- function(n,l=20) {
+  a <- do.call(paste0, replicate(l, sample(c("A","C","D","E","F","G","H","I","K","L","M","N","P","Q","R","S","T","V","W","Y"), n, TRUE), FALSE))
+}
+
+udata=data.frame(AA.JUNCTION=cdr3_generator(1000),stringsAsFactors = F)
+udata$ID=row.names(udata)
+
+#data <- read.csv(file.choose(), header = TRUE, sep = ";")
 #data <- read.csv("data/SampleData.csv", header = TRUE, sep = ";")
 
 
 # Usefull Data
-udata <- data[c(1,3)]
+#udata <- data[c(1,3)]
 udata$AA.JUNCTION <- as.character(udata$AA.JUNCTION)
 # A list with the similarity groups
 sim = list("F","W",c("A","I","L","V"),c("M","C"),"P","G","Y",c("T","S"),c("H","K","R"),c("E","D"),c("Q","N"))
