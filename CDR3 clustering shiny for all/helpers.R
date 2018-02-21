@@ -211,45 +211,73 @@ Divide <- function(list4,let,sim,d,algo,algocol){
   
   if (algo == "Identity"){
     x1 = str_which(str_detect(str_sub(udata[udata$clusters == br,]$AA.JUNCTION,(cel[ela,2]+algocol),(cel[ela,2]+algocol)), let[cel[ela,1]]), "TRUE")
-    mk = length(x1)
-    cltp = cl + 1
-    ggdf[nrow(ggdf) + 1,] = c(cltp,mk)
+    mk1 = length(x1)
+    cltp1 = cl + 1
     y1 = udata[udata$clusters == br,]$AA.JUNCTION
     z1 = y1[x1]
     x2 = str_which(str_detect(str_sub(udata[udata$clusters == br,]$AA.JUNCTION,(cel[ela,2]+algocol),(cel[ela,2]+algocol)), let[cel[ela,1]]), "FALSE")
-    mk = length(x2)
-    cltp = cl + 2
-    ggdf[nrow(ggdf) + 1,] = c(cltp,mk)
+    mk2 = length(x2)
+    cltp2 = cl + 2
     y2 = udata[udata$clusters == br,]$AA.JUNCTION
     z2 = y2[x2]
+    lengdif = FALSE
+    if(mk1 < mk2){
+      lengdif = TRUE
+      templeng = z1
+      z1 = z2
+      z2 = templeng
+      ggdf[nrow(ggdf) + 1,] = c(cltp1,mk2)
+      ggdf[nrow(ggdf) + 1,] = c(cltp2,mk1)
+    }else{
+      ggdf[nrow(ggdf) + 1,] = c(cltp1,mk1)
+      ggdf[nrow(ggdf) + 1,] = c(cltp2,mk2)
+    }
     for(i in 1:length(z1)){
       udata[str_which(udata$AA.JUNCTION,z1[i]),sprintf('level.%d', ep)] = cl+1
     }
     for(i in 1:length(z2)){
       udata[str_which(udata$AA.JUNCTION,z2[i]),sprintf('level.%d', ep)] = cl+2
     }
-    udata[udata$clusters == br,]$clusters <- ifelse(str_detect(str_sub(udata[udata$clusters == br,]$AA.JUNCTION,(cel[ela,2]+algocol),(cel[ela,2]+algocol)), let[cel[ela,1]]), cl+1 ,cl+2)
+    if(lengdif == TRUE){
+      udata[udata$clusters == br,]$clusters <- ifelse(str_detect(str_sub(udata[udata$clusters == br,]$AA.JUNCTION,(cel[ela,2]+algocol),(cel[ela,2]+algocol)), let[cel[ela,1]]), cl+2 ,cl+1)
+    }else{
+      udata[udata$clusters == br,]$clusters <- ifelse(str_detect(str_sub(udata[udata$clusters == br,]$AA.JUNCTION,(cel[ela,2]+algocol),(cel[ela,2]+algocol)), let[cel[ela,1]]), cl+1 ,cl+2)
+    }
   }else{
     strings.to.find = unlist(sim[cel[ela,1]])
     x1 = str_which(str_detect(str_sub(udata[udata$clusters == br,]$AA.JUNCTION,(cel[ela,2]+algocol),(cel[ela,2]+algocol)), str_c(strings.to.find, collapse="|")), "TRUE")
-    mk = length(x1)
-    cltp = cl + 1
-    ggdf[nrow(ggdf) + 1,] = c(cltp,mk)
+    mk1 = length(x1)
+    cltp1 = cl + 1
     y1 = udata[udata$clusters == br,]$AA.JUNCTION
     z1 = y1[x1]
     x2 = str_which(str_detect(str_sub(udata[udata$clusters == br,]$AA.JUNCTION,(cel[ela,2]+algocol),(cel[ela,2]+algocol)), str_c(strings.to.find, collapse="|")), "FALSE")
-    mk = length(x2)
-    cltp = cl + 2
-    ggdf[nrow(ggdf) + 1,] = c(cltp,mk)
+    mk2 = length(x2)
+    cltp2 = cl + 2
     y2 = udata[udata$clusters == br,]$AA.JUNCTION
     z2 = y2[x2]
+    lengdif = FALSE
+    if(mk1 < mk2){
+      lengdif = TRUE
+      templeng = z1
+      z1 = z2
+      z2 = templeng
+      ggdf[nrow(ggdf) + 1,] = c(cltp1,mk2)
+      ggdf[nrow(ggdf) + 1,] = c(cltp2,mk1)
+    }else{
+      ggdf[nrow(ggdf) + 1,] = c(cltp1,mk1)
+      ggdf[nrow(ggdf) + 1,] = c(cltp2,mk2)
+    }
     for(i in 1:length(z1)){
       udata[str_which(udata$AA.JUNCTION,z1[i]),sprintf('level.%d', ep)] = cl+1
     }
-     for(i in 1:length(z2)){
+    for(i in 1:length(z2)){
       udata[str_which(udata$AA.JUNCTION,z2[i]),sprintf('level.%d', ep)] = cl+2
     }
-    udata[udata$clusters == br,]$clusters <- ifelse(str_detect(str_sub(udata[udata$clusters == br,]$AA.JUNCTION,(cel[ela,2]+algocol),(cel[ela,2]+algocol)), str_c(strings.to.find, collapse="|")), cl+1 ,cl+2) 
+    if(lengdif == TRUE){
+      udata[udata$clusters == br,]$clusters <- ifelse(str_detect(str_sub(udata[udata$clusters == br,]$AA.JUNCTION,(cel[ela,2]+algocol),(cel[ela,2]+algocol)), str_c(strings.to.find, collapse="|")), cl+2 ,cl+1) 
+    }else{
+      udata[udata$clusters == br,]$clusters <- ifelse(str_detect(str_sub(udata[udata$clusters == br,]$AA.JUNCTION,(cel[ela,2]+algocol),(cel[ela,2]+algocol)), str_c(strings.to.find, collapse="|")), cl+1 ,cl+2) 
+    }
   }
   
   result4 = list("ggdf" = ggdf,"dfsum" = list4$dfsum,"list" = list4$list, "listn" = list4$listn, "udata" = udata,"permat"= list4$permat, "persim" = list4$persim, "br" = list4$br, "cl" = list4$cl, "met" = list4$met, "ep"= list4$ep, "clep" = list4$clep,"nn" = list4$nn, "sumper" = list4$sumper, "sumper2" = list4$sumper2, "ela" = list4$ela, "cel" = list4$cel,"endper" = list4$endper, "last" = list4$last)
@@ -311,7 +339,8 @@ geomSeq <- function(start,ratio,begin,end){
 }
 
 
-Den <- function(lev,df,lastlist){
+Den <- function(lev,df,lastlist,flagtic){
+  if(flagtic == TRUE) tic(lev,lev)
   df = df[ do.call( order , df[ , match(  colnames(df[str_which(names(df), "level.")]) , names(df) ) ]  ) , ]
   df_args <- c(df[str_which(names(df), "level.")], sep="/")
   if(lev == max(lastlist$clep)){
@@ -344,6 +373,7 @@ Den <- function(lev,df,lastlist){
   df$pathString = kk
   x <- ToDataFrameTree(df, "pathstring")
   xN <- as.Node(x)
+  if(flagtic == TRUE) toc(log = TRUE,quiet = TRUE)
   plot(xN)
 }
 
@@ -352,7 +382,8 @@ cs1 = make_col_scheme(chars=c("F","W","A","I","L","V","M","C","P","G","Y","T","S
                       cols=c("#1E90FF", "#BA55D3", "#0000FF", "#0000FF", "#0000FF", "#0000FF", "#C6E2FF", "#C6E2FF", "#FFD700", "#00EE00", "#C1FFC1", "#54FF9F", "#54FF9F", "#FF0000", "#FF0000", "#FF0000", "#FFD700", "#FFD700", "#ED9121", "#ED9121"))
 
 # A function to plot with logo level lev
-LogoLev <- function(lev,lastlist,df){
+LogoLev <- function(lev,lastlist,df,flagtic){
+  if(flagtic == TRUE) tic("LogoLev")
   t1 = which(lastlist$clep == lev)
   listff = list()
   if(length(t1) %% 3 == 0){
@@ -368,16 +399,20 @@ LogoLev <- function(lev,lastlist,df){
     listff$temp = x1
     names(listff)[length(listff)] = sprintf('Cluster.%d', t1[i])
   }
+  if(flagtic == TRUE) toc(log = TRUE,quiet = TRUE)
   ggseqlogo(listff, ncol=nc, method = "prob",col_scheme=cs1)
 }
 
 # Creating a plot for cluster 5 for example
-LogoCl <- function(cl,lastlist,df){
+LogoCl <- function(cl,lastlist,df,flagtic){
+  if(flagtic == TRUE) tic("LogoCl")
+  if(flagtic == TRUE) toc(log = TRUE,quiet = TRUE)
   ggseqlogo(na.omit(df[df[names(df) == sprintf('level.%d', lastlist$clep[cl])] == cl,]$AA.JUNCTION), method = "prob", col_scheme=cs1)
 }
 
 # A function to plot with barplot level lev
-BarLev <- function(lev,lastlist,perlist,persimlist,Clus,let,sim,cho){
+BarLev <- function(lev,lastlist,perlist,persimlist,Clus,let,sim,cho,flagtic){
+  if(flagtic == TRUE) tic("BarLev")
   if(cho == "Identity"){
     t2 = which(lastlist$clep == lev)
     if(length(t2) %% 3 == 0){
@@ -407,12 +442,13 @@ BarLev <- function(lev,lastlist,perlist,persimlist,Clus,let,sim,cho){
       legend("topright",inset=c(-0.03,0), fill=heat.colors(length(output[,1])-1), legend=names(sim),cex = 0.6)
     }
   }
+  if(flagtic == TRUE) toc(log = TRUE,quiet = TRUE)
 }
 
 
 # An alternative plot for cluster 3 (We must determine the cluster's permat)
-BarCl <- function(cl,perlist,persimlist,Clus,let,sim,cho,lastlist){
-  
+BarCl <- function(cl,perlist,persimlist,Clus,let,sim,cho,lastlist,flagtic){
+  if(flagtic == TRUE) tic(cl,cl)
   if(cho == "Identity"){
     par(mar=c(3,3,4,4),xpd=TRUE)
     output <- matrix(unlist(perlist[cl]), ncol = str_length(lastlist$udata$AA.JUNCTION[1]), byrow = FALSE)
@@ -424,11 +460,12 @@ BarCl <- function(cl,perlist,persimlist,Clus,let,sim,cho,lastlist){
     barplot(output[-nrow(output),], col=heat.colors(length(output[,1])-1), width=2, main = sprintf('Cluster.%d',cl)) 
     legend("topright",inset=c(-0.03,0), fill=heat.colors(length(output[,1])-1), legend=names(sim),cex = 0.6)
   }
-  
+  if(flagtic == TRUE) toc(log = TRUE,quiet = TRUE)
 }
 
 # Sequences and Id's for specific level
-AminoLev <- function(level,lastlist,df,Clus){
+AminoLev <- function(level,lastlist,df,Clus,flagtic){
+  if(flagtic == TRUE) tic("AminoLev")
   sum(Clus[Clus$level == level,]$seqnum) # akoloy8ies sto level
   x4 = data_frame("Sequence.ID" = character(0),"AA.JUNCTION" = character(0))
   gg = na.omit(unique(df[,which(names(df) == sprintf("level.%d", level))]))
@@ -446,11 +483,13 @@ AminoLev <- function(level,lastlist,df,Clus){
   aa2 = as.character(x4$AA.JUNCTION)
   aa2 = as.list(aa2)
   names(aa2) = se2
+  if(flagtic == TRUE) toc(log = TRUE,quiet = TRUE)
   x4 # Print in console
 }
 
 # Sequences and Id's for specific cluster
-AminoCl <- function(clust,lastlist,df){
+AminoCl <- function(clust,lastlist,df,flagtic){
+  #if(flagtic == TRUE) tic("AminoCl")
   if(clust == 0){
     x3 = data.frame("Sequence.ID" = df$Sequence.ID, "AA.JUNCTION" = df$AA.JUNCTION)
   }else{
@@ -462,12 +501,14 @@ AminoCl <- function(clust,lastlist,df){
     aa = as.list(aa)
     names(aa) = se 
   }
+  #if(flagtic == TRUE) toc(log = TRUE,quiet = TRUE)
   x3 # Print in console
 }
 
 
 # A function which visualize the sequences of a data frame using common letters (i.e. "A _ _ _ _ K R _ _ _ Q _ Y Y Y _ _ _ T _")
-Opt <- function(df){
+Opt <- function(df,flagtic){
+  #if(flagtic == TRUE) tic("Opt")
   xar <- matrix(0,nrow=1, ncol=str_length(df$AA.JUNCTION[1]))
   for (i in 1:str_length(df$AA.JUNCTION[1])) {
     f <- table(str_sub(df$AA.JUNCTION,i,i))
@@ -477,12 +518,14 @@ Opt <- function(df){
     }
     
   }
+ # if(flagtic == TRUE) toc(log = TRUE,quiet = TRUE)
   paste(xar,collapse = ' ')
 }
 
 
 # A function which visualize the sequences of a data frame using similarity groups (i.e. "A _ _ _ _ K Am _ Ba _ Ac _ Y Y Y _ _ _ T _")
-Opt2 <- function(df,sim,alt,altsim){
+Opt2 <- function(df,sim,alt,altsim,flagtic){
+  #if(flagtic == TRUE) tic("Opt2")
   xar <- matrix(0,nrow=1, ncol=str_length(df$AA.JUNCTION[1]))
   for (i in 1:str_length(df$AA.JUNCTION[1])) {
     f <- table(str_sub(df$AA.JUNCTION,i,i))
@@ -505,23 +548,28 @@ Opt2 <- function(df,sim,alt,altsim){
     }
     
   }
+  #if(flagtic == TRUE) toc(log = TRUE,quiet = TRUE)
   paste(xar,collapse = ' ')
 }
 
-Id <- function(ff,cho){
+Id <- function(ff,cho,flagtic){
+  if(flagtic == TRUE) tic("Id")
   if(cho == "Identity"){
     par(xpd=TRUE)
     pp <- data.frame(x = ff$level,y = ff$sumper)
+    if(flagtic == TRUE) toc(log = TRUE,quiet = TRUE)
     ggplot(pp,aes(x = x,y = y)) + stat_sum()
   }else{
     par(xpd=TRUE)
     pp <- data.frame(x = ff$level,y = ff$sumper2)
+    if(flagtic == TRUE) toc(log = TRUE,quiet = TRUE)
     ggplot(pp,aes(x = x,y = y)) + stat_sum()
   }
 }
 
 
-cc <- function(df,Clus){
+cc <- function(df,Clus,flagtic){
+  if(flagtic == TRUE) tic("Collapsible")
   df = df[ do.call( order , df[ , match(  colnames(df[str_which(names(df), "level.")]) , names(df) ) ]  ) , ]
   ii = Clus$seqnum
   ii = as.character(ii)
@@ -547,6 +595,7 @@ cc <- function(df,Clus){
       }
     }
   }
+  if(flagtic == TRUE) toc(log = TRUE,quiet = TRUE)
   collapsibleTree(
     trid1,
     hierarchy = colnames(df[str_which(names(df), "level.")]),
@@ -557,24 +606,31 @@ cc <- function(df,Clus){
   )
 }
 
-idenlev <- function(lev,Clus,cho){
+idenlev <- function(lev,Clus,cho,flagtic){
+  if(flagtic == TRUE) tic("idenlev")
   if(cho == "Identity"){
+    if(flagtic == TRUE) toc(log = TRUE,quiet = TRUE)
     sum(Clus[Clus$level == lev,]$Identity) /  length(Clus[Clus$level == lev,]$Identity)
     
   }else{
+    if(flagtic == TRUE) toc(log = TRUE,quiet = TRUE)
     sum(Clus[Clus$level == lev,]$Similarity) /  length(Clus[Clus$level == lev,]$Similarity)
   }
 }
 
-idencl <- function(cl,Clus,cho){
+idencl <- function(cl,Clus,cho,flagtic){
+  if(flagtic == TRUE) tic("idencl")
   if(cho == "Identity"){
+    if(flagtic == TRUE) toc(log = TRUE,quiet = TRUE)
     Clus[Clus$ClusterId == cl,]$Identity
   }else{
+    if(flagtic == TRUE) toc(log = TRUE,quiet = TRUE)
     Clus[Clus$ClusterId == cl,]$Similarity 
   }
 }
 
-EmPin <- function(lastlist,Clus,dfsd){
+EmPin <- function(lastlist,Clus,dfsd,flagtic){
+  if(flagtic == TRUE) tic("EmPin")
   for (i in 0:(max(lastlist$clep))) {
     t1 = sum(Clus[Clus$level == i,]$Identity) /  length(Clus[Clus$level == i,]$Identity)
     t2 = sd(Clus[Clus$level == i,]$Identity)
@@ -584,10 +640,13 @@ EmPin <- function(lastlist,Clus,dfsd){
     dfsd[i+1,] = c(rows,t1,t2,t3,t4)
   }
   colnames(dfsd)[1]="Level"
+  if(flagtic == TRUE) toc(log = TRUE,quiet = TRUE)
   dfsd
 }
 
-Netw <- function(lev,thr,thrt,netyp,df,lastlist,Clus,sim,altsim){
+Netw <- function(lev,thr,thrt,netyp,df,lastlist,Clus,sim,altsim,ts,shth,net_sil,flagtic){
+  if(flagtic == TRUE) tic("Network")
+  # We change the plotting parameters
   df = df[ do.call( order , df[ , match(  colnames(df[str_which(names(df), "level.")]) , names(df) ) ]  ) , ]
   df_args <- c(df[str_which(names(df), "level.")], sep="/")
   if(lev == max(lastlist$clep)){
@@ -633,8 +692,8 @@ Netw <- function(lev,thr,thrt,netyp,df,lastlist,Clus,sim,altsim){
   for(i in 1:(max(bo)+1)){
     tempN1 = FindNode(xN,(sprintf("%d", i-1)))
     tempN1 = tempN1$path
-    temp2N1 = Opt(AminoCl(i-1,lastlist,df))
-    temp3N1 = Opt2(AminoCl(i-1,lastlist,df),sim,TRUE,altsim)
+    temp2N1 = Opt(AminoCl(i-1,lastlist,df,flagtic),flagtic)
+    temp3N1 = Opt2(AminoCl(i-1,lastlist,df,flagtic),sim,TRUE,altsim,flagtic)
     for(j in i:(max(bo)+1)){          # max(df$clusters)+1
       tempN2 = FindNode(xN,(sprintf("%d", j-1)))
       tempN2 = tempN2$path
@@ -643,9 +702,9 @@ Netw <- function(lev,thr,thrt,netyp,df,lastlist,Clus,sim,altsim){
       d1 = length(tempN1) - tem[length(tem)]
       d2 = length(tempN2) - tem[length(tem)]
       ffg[i,j]= d1 + d2
-      temp2N2 = Opt(AminoCl(j-1,lastlist,df))
+      temp2N2 = Opt(AminoCl(j-1,lastlist,df,flagtic),flagtic)
       temp2N2 = str_replace_all(temp2N2,"_"," ")
-      temp3N2 = Opt2(AminoCl(j-1,lastlist,df),sim,TRUE,altsim)
+      temp3N2 = Opt2(AminoCl(j-1,lastlist,df,flagtic),sim,TRUE,altsim,flagtic)
       temp3N2 = str_replace_all(temp3N2,"_"," ")
       ffg2[i,j] = stringdist(temp2N1,temp2N2,method = "lv" )
       ffg2sim[i,j] = stringdist(temp3N1,temp3N2,method = "lv" )
@@ -658,22 +717,71 @@ Netw <- function(lev,thr,thrt,netyp,df,lastlist,Clus,sim,altsim){
   
   #find max
   ma =max(na.omit(as.vector(ffg)))
+  
   ffg[which(ffg == 0)] = ma #gia na mhn fainontai velakia pisw
-  ffg3 = 0.125 * (str_length(lastlist$udata$AA.JUNCTION[1]) - ffg2) + 0.125 * (str_length(lastlist$udata$AA.JUNCTION[1]) - ffg2sim) +0.125 * (ma - ffg) * (str_length(lastlist$udata$AA.JUNCTION[1]) / ma)
+  ffg2 = str_length(lastlist$udata$AA.JUNCTION[1]) - ffg2
+  ffg2sim = str_length(lastlist$udata$AA.JUNCTION[1]) - ffg2sim
+  ffg3 = (2/str_length(lastlist$udata$AA.JUNCTION[1])) * ffg2 + (2/str_length(lastlist$udata$AA.JUNCTION[1])) * ffg2sim + (2 / ma) * (ma - ffg)
   
   if(thrt == "Distance"){
     thrtyp = ffg
-  }else if (thrt == "StrSimilarity"){
+  }else if (thrt == "StrIdentSimilarity"){
     thrtyp = ffg2
+  }else if (thrt == "StrGroupSimilarity"){
+    thrtyp = ffg2sim
   }else{
     thrtyp = ffg3
   }
+ 
+  #if (shth == TRUE){
+  #  return(max(na.omit(as.vector(thrtyp))))
+  #}
+  
   tempor = ffg
   tempor2 = ffg2
+  tempor2sim = ffg2sim
   tempor3 = ffg3
   tempor[which(thrtyp > thr)] = 0
   tempor2[which(thrtyp > thr)] = 0
+  tempor2sim[which(thrtyp > thr)] = 0
   tempor3[which(thrtyp> thr)] = 0
+  
+  if(thrt == "Distance"){
+    thrtyp2 = tempor
+  }else if (thrt == "StrIdentSimilarity"){
+    thrtyp2 = tempor2
+  }else if (thrt == "StrGroupSimilarity"){
+    thrtyp2 = tempor2sim
+  }else{
+    thrtyp2 = tempor3
+  }
+  
+  if(net_sil == TRUE){
+    jhj = silhouette(Clus$level[1:(max(bo)+1)],t(tempor))
+    matches <- regmatches(unique(x$pathString), gregexpr("[[:digit:]]+", unique(x$pathString)))
+    for(i in 1:length(unique(x$pathString))){
+      ttt =jhj[as.numeric(unlist(matches[i])),3]
+      flag = FALSE
+      j = length(ttt)
+      mcl = length(ttt)
+      while(flag == FALSE){
+        if(ttt[j] >= ttt[j-1]){
+          tempor3[j-1,j] = 0
+          ffg3[j-1,j] = 0
+          thrtyp[j-1,j] = 0
+          thrtyp2[j-1,j] = 0
+          j = j - 1
+        }else{
+          mcl = j
+          flag = TRUE
+        }
+        
+        if(j == 1){
+          flag = TRUE
+        }
+      }
+    }
+  }
   
   jjj = matrix(1,nrow = max(bo)+1,ncol = (max(bo)+1))
   net0 <- graph_from_adjacency_matrix(jjj,mode = "upper")
@@ -712,20 +820,31 @@ Netw <- function(lev,thr,thrt,netyp,df,lastlist,Clus,sim,altsim){
   E(net1)$edge.color <- "gray80"
   pal1 <- rainbow(6, alpha=1) 
   
-  if(netyp == "whole"){
+  
+  #if(netyp == "whole"){
     net0.copy <- igraph::delete.edges(net0, which(E(net0)$width == 0))
-    plot(net0.copy, edge.color=na.omit(pal1[( E(net0.copy)$width %/% 1) +1]), edge.curved=.1, vertex.label.color = "black") #plot the network graph
-    legend("topleft", inset=c(0.1,0.2), colnames(df[str_which(names(df), "level.")])[1:(max(bb)+1)], pch=21,
-           col="#777777", pt.bg=colrs, pt.cex=2, cex=.8, bty="n", ncol=1)
-    legend("topright", inset=c(0.1,0.2), c("0-1","1-2","2-3","3-4","4-5","5"), pch=21,
-           col="#777777", pt.bg=pal1, pt.cex=2, cex=.8, bty="n", ncol=1,title = "Relationship strength")
-  }else{
+  #  par(mfrow = c(1,2))
+  #  plot(net0.copy, edge.color=na.omit(pal1[( E(net0.copy)$width %/% 1) +1]), edge.curved=.1, vertex.label.color = "black") #plot the network graph
+  #  legend("topleft", inset=c(0.1,0.2), colnames(df[str_which(names(df), "level.")])[1:(max(bb)+1)], pch=21,
+  #         col="#777777", pt.bg=colrs, pt.cex=2, cex=.8, bty="n", ncol=1)
+  #  legend("topright", inset=c(0.1,0.2), c("0-1","1-2","2-3","3-4","4-5","5"), pch=21,
+  #         col="#777777", pt.bg=pal1, pt.cex=2, cex=.8, bty="n", ncol=1,title = "Relationship strength")
+  #  matrix.heatmap(thrtyp)
+  #}else{
     net1.copy <- igraph::delete.edges(net1, which(E(net1)$width == 0))
-    plot(net1.copy, edge.color=na.omit(pal1[( E(net1.copy)$width %/% 1) +1]), edge.curved=.1, vertex.label.color = "black") #plot the network graph
-    legend("topleft", inset=c(0.1,0.2), colnames(df[str_which(names(df), "level.")])[1:(max(bb)+1)], pch=21,
-           col="#777777", pt.bg=colrs, pt.cex=2, cex=.8, bty="n", ncol=1)
-    legend("topright", inset=c(0.1,0.2), c("0-1","1-2","2-3","3-4","4-5","5"), pch=21,
-           col="#777777", pt.bg=pal1, pt.cex=2, cex=.8, bty="n", ncol=1,title = "Relationship strength")
-  }
+  #  plot(net1.copy, edge.color=na.omit(pal1[( E(net1.copy)$width %/% 1) +1]), edge.curved=.1, vertex.label.color = "black") #plot the network graph
+  #  legend("topleft", inset=c(0.1,0.2), colnames(df[str_which(names(df), "level.")])[1:(max(bb)+1)], pch=21,
+  #         col="#777777", pt.bg=colrs, pt.cex=2, cex=.8, bty="n", ncol=1)
+  #  legend("topright", inset=c(0.1,0.2), c("0-1","1-2","2-3","3-4","4-5","5"), pch=21,
+  #         col="#777777", pt.bg=pal1, pt.cex=2, cex=.8, bty="n", ncol=1,title = "Relationship strength")
+  #  matrix.heatmap(thrtyp2)
+  #}
+  
+  
+  #if (ts == TRUE){
+  #  return(thrtyp)
+  #}
+  if(flagtic == TRUE) toc(log = TRUE,quiet = TRUE)
+  listnet = list("net0.copy" = net0.copy, "net1.copy" = net1.copy, "bb" = bb, "colrs" = colrs, "ma" = ma, "ffg" = ffg, "ffg2" = ffg2, "ffg2sim" = ffg2sim, "ffg3" = ffg3 ,"tempor" = tempor, "tempor2" = tempor2, "tempor2sim" = tempor2sim, "tempor3" = tempor3,"thrtyp" = thrtyp, "thrtyp2" = thrtyp2)
+  return(listnet)
 }
-
