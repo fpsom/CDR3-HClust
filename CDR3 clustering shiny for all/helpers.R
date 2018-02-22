@@ -522,6 +522,25 @@ Opt <- function(df,flagtic){
   paste(xar,collapse = ' ')
 }
 
+OptNew <- function(df){
+  xar <- matrix(0,nrow=1, ncol=str_length(df$AA.JUNCTION[1]))
+  for (i in 1:str_length(df$AA.JUNCTION[1])) {
+    f <- table(str_sub(df$AA.JUNCTION,i,i))
+    if (length(which(f == max(f))) > 1){
+      tempopt = "-"
+      tempopt = paste(tempopt,names(which(f == max(f)))[1],sep = "")
+      #tempopt =  names(which(f == max(f)))[1]
+      for(j in 2:(length(which(f == max(f))))){
+        tempopt = paste(tempopt, names(which(f == max(f)))[j],sep = "|")
+      }
+      tempopt = paste(tempopt,"-",sep = "")
+      xar[i] = tempopt
+    }else{
+      xar[i] = names(which(f == max(f)))
+    }
+  }
+  paste(xar,collapse = ' ')
+}
 
 # A function which visualize the sequences of a data frame using similarity groups (i.e. "A _ _ _ _ K Am _ Ba _ Ac _ Y Y Y _ _ _ T _")
 Opt2 <- function(df,sim,alt,altsim,flagtic){
@@ -549,6 +568,36 @@ Opt2 <- function(df,sim,alt,altsim,flagtic){
     
   }
   #if(flagtic == TRUE) toc(log = TRUE,quiet = TRUE)
+  paste(xar,collapse = ' ')
+}
+
+Opt2New <- function(df,sim){
+  xar <- matrix(0,nrow=1, ncol=str_length(df$AA.JUNCTION[1]))
+  for (i in 1:str_length(df$AA.JUNCTION[1])) {
+    f <- table(str_sub(df$AA.JUNCTION,i,i))
+    for(j in 1:length(f)){
+      if( length(which(str_detect(names(f),names(sim[str_which(sim,names(f)[j])])))) == 0 ){
+        names(f)[j] = names(sim[str_which(sim,names(f)[j])])
+      }else if(which(str_detect(names(f),names(sim[str_which(sim,names(f)[j])]))) != j){
+        f[which(str_detect(names(f),names(sim[str_which(sim,names(f)[j])])))] = f[which(str_detect(names(f),names(sim[str_which(sim,names(f)[j])])))] + f[j]
+        names(f)[j] = "dip"
+      }
+    }
+    if(length(which(names(f) == "dip")) != 0 ){
+      f = f[-which(names(f) == "dip")] 
+    }
+    if (length(which(f == max(f))) > 1){
+      tempopt = "-"
+      tempopt = paste(tempopt,names(which(f == max(f)))[1],sep = "")
+      for(j in 2:(length(which(f == max(f))))){
+        tempopt = paste(tempopt, names(which(f == max(f)))[j],sep = "|")
+      }
+      tempopt = paste(tempopt,"-",sep = "")
+      xar[i] = tempopt
+    }else{
+      xar[i] = names(which(f == max(f)))
+    }
+  }
   paste(xar,collapse = ' ')
 }
 

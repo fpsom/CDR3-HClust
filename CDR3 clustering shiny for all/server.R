@@ -191,22 +191,42 @@ shinyServer(
     
       output$opt1lev <- renderText({
         if (is.null(dir()) | is.null(input$Dataset)) return()
-        Opt(AminoLev(input$opt1_level,lastlist,df,Clus,flagtic),flagtic)
+        Opt(AminoLev(input$opt_level,lastlist,df,Clus,flagtic),flagtic)
       })
-    
+      
+      output$opt1Newlev <- renderText({
+        if (is.null(dir()) | is.null(input$Dataset)) return()
+        OptNew(AminoLev(input$opt_level,lastlist,df,Clus,flagtic))
+      })
+      
       output$opt1cl <- renderText({
         if (is.null(dir()) | is.null(input$Dataset)) return()
-        Opt(AminoCl(input$opt1_cluster,lastlist,df,flagtic),flagtic)
+        Opt(AminoCl(input$opt_cluster,lastlist,df,flagtic),flagtic)
+      })
+      
+      output$opt1Newcl <- renderText({
+        if (is.null(dir()) | is.null(input$Dataset)) return()
+        OptNew(AminoCl(input$opt_cluster,lastlist,df,flagtic))
       })
     
       output$opt2lev <- renderText({
         if (is.null(dir()) | is.null(input$Dataset)) return()
-        Opt2(AminoLev(input$opt2_level,lastlist,df,Clus,flagtic),sim,FALSE,altsim,flagtic)
+        Opt2(AminoLev(input$opt_level,lastlist,df,Clus,flagtic),sim,FALSE,altsim,flagtic)
+      })
+      
+      output$opt2Newlev <- renderText({
+        if (is.null(dir()) | is.null(input$Dataset)) return()
+        Opt2New(AminoLev(input$opt_level,lastlist,df,Clus,flagtic),sim)
       })
     
       output$opt2cl <- renderText({
         if (is.null(dir()) | is.null(input$Dataset)) return()
-        Opt2(AminoCl(input$opt2_cluster,lastlist,df,flagtic),sim,FALSE,altsim,flagtic)
+        Opt2(AminoCl(input$opt_cluster,lastlist,df,flagtic),sim,FALSE,altsim,flagtic)
+      })
+      
+      output$opt2Newcl <- renderText({
+        if (is.null(dir()) | is.null(input$Dataset)) return()
+        Opt2New(AminoCl(input$opt_cluster,lastlist,df,flagtic),sim)
       })
     
       output$idplot <- renderPlot({
@@ -425,9 +445,15 @@ shinyServer(
         condition = "input.ComLetters % 2 == 1",
         br(),
         br(),
-        numericInput("opt1_level", "Select level to show:", 5,  min = 1, max = max(lastlist$clep), width="140px"),
-        br(),
-        textOutput('opt1lev')
+        numericInput("opt_level", "Select level to show:", 5,  min = 1, max = max(lastlist$clep), width="140px"),
+        br("Identity Consensus Sequence for a specific level"),
+        textOutput('opt1lev'),
+        br("Identity Consensus Sequence with higher sequence letters for a specific level"),
+        textOutput('opt1Newlev'),
+        br("Similarity Consensus Sequence for a specific level"),
+        textOutput('opt2lev'),
+        br("Similarity Consensus Sequence with higher sequence groups for a specific level"),
+        textOutput('opt2Newlev')
       )
     })
     
@@ -436,33 +462,39 @@ shinyServer(
         condition = "input.ComLetters % 2 == 1",
         br(),
         br(),
-        numericInput("opt1_cluster", "Select cluster to show:", 5,  min = 0, max = max(df$clusters), width="140px"),
-        br(),
-        textOutput('opt1cl')
+        numericInput("opt_cluster", "Select cluster to show:", 5,  min = 0, max = max(df$clusters), width="140px"),
+        br("Identity Consensus Sequence for a specific cluster"),
+        textOutput('opt1cl'),
+        br("Identity Consensus Sequence with higher sequence letters for a specific cluster"),
+        textOutput('opt1Newcl'),
+        br("Similarity Consensus Sequence for a specific cluster"),
+        textOutput('opt2cl'),
+        br("Similarity Consensus Sequence with higher sequence groups for a specific cluster"),
+        textOutput('opt2Newcl')
       )
     })
     
-    output$g14 <- renderUI({
-      conditionalPanel(
-        condition = "input.ComGroups % 2 == 1",
-        br(),
-        br(),
-        numericInput("opt2_level", "Select level to show:", 5,  min = 1, max = max(lastlist$clep), width="140px"),
-        br(),
-        textOutput('opt2lev')
-      )
-    })
+    #output$g14 <- renderUI({
+    #  conditionalPanel(
+    #    condition = "input.ComGroups % 2 == 1",
+    #    br(),
+    #    br(),
+    #    numericInput("opt2_level", "Select level to show:", 5,  min = 1, max = max(lastlist$clep), width="140px"),
+    #    br(),
+    #    textOutput('opt2lev')
+    #  )
+    #})
     
-    output$g15 <- renderUI({
-      conditionalPanel(
-        condition = "input.ComGroups % 2 == 1",
-        br(),
-        br(),
-        numericInput("opt2_cluster", "Select cluster to show:", 5,  min = 1, max = max(df$clusters), width="140px"),
-        br(),
-        textOutput('opt2cl')
-      )
-    })
+    #output$g15 <- renderUI({
+    #  conditionalPanel(
+    #    condition = "input.ComGroups % 2 == 1",
+    #    br(),
+    #    br(),
+    #    numericInput("opt2_cluster", "Select cluster to show:", 5,  min = 1, max = max(df$clusters), width="140px"),
+    #    br(),
+    #    textOutput('opt2cl')
+    #  )
+    #})
     
     output$g16 <- renderUI({
       conditionalPanel(

@@ -161,8 +161,9 @@ font-family: "Arial";
              br(),
              br(),
              actionButton("ComLetters", "Show Common Letters", style="color: #fff; background-color: #5F021F; border-color: #fff"),
-             uiOutput("g12"),
-             uiOutput("g13")
+             splitLayout( uiOutput("g12"),
+                          uiOutput("g13")
+             )
            )),
   tabPanel("ComGroups", value = "ComGroupsTab", 
            mainPanel( 
