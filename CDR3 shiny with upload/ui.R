@@ -40,10 +40,13 @@ function(request) {navbarPage(
                     )
                   ),
                   column(8,
+                    checkboxInput("fdet", "Show File Details", FALSE),
                     tabsetPanel(
                       tabPanel("Files table", dataTableOutput("tbl")),
                       tabPanel("Files list", dataTableOutput("tbl2"))
                     )
+                    
+                    
                   )
                 )
             ),

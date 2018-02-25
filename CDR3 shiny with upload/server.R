@@ -47,10 +47,14 @@ shinyServer(
       
     })
     output$tbl <- DT::renderDataTable(
-      dfup()
+      if(input$fdet == TRUE){
+        dfup()
+      }
     )
     output$tbl2 <- DT::renderDataTable(
-      input$fileIn
+      if(input$fdet == TRUE){
+        input$fileIn
+      }
     )
     output$results = renderPrint({
     })
@@ -67,7 +71,7 @@ shinyServer(
       listq = list("ggdf" = ggdf, "dfsum" = dfsum,"list" = listxx, "listn" = listyy,"udata" = udata,"permat"= NA, "persim" = NA, "br" = br, "cl" = cl, "met" = met, "ep" = ep , "clep" = clep, "nn" = nn, "sumper" = NA,"sumper2" = NA, "ela" = NA, "cel" = NA,"endper" = endper, "last" = last)
       if(flagtic == TRUE){
         tic.clearlog()
-        tic("lastlist") 
+        tic(sprintf("lastlist -- Algorith type: %s, Column number: %d ", input$algorithm_type, input$column_num)) 
       }
       lastlist = Matrices(listq,FALSE,let,sim,d,input$algorithm_type,input$column_num)
       if(flagtic == TRUE) toc(log = TRUE,quiet = TRUE)
@@ -94,7 +98,8 @@ shinyServer(
       }
     
       mm = 1
-    
+      fname = input$fileIn$name
+      
       output$message <- renderText({
         if(is.null(mm)) return()
         "Data available from now on"
@@ -270,6 +275,7 @@ shinyServer(
                    col="#777777", pt.bg=pal1, pt.cex=2, cex=.8, bty="n", ncol=1,title = "Relationship strength")
             matrix.heatmap(thrtyp)
           }else{
+            par(mfrow = c(1,2))
             plot(net1.copy, edge.color=na.omit(pal1[( E(net1.copy)$width %/% 1) +1]), edge.curved=.1, vertex.label.color = "black") #plot the network graph
             legend("topleft", inset=c(0.1,0.2), colnames(df[str_which(names(df), "level.")])[1:(max(bb)+1)], pch=21,
                    col="#777777", pt.bg=colrs, pt.cex=2, cex=.8, bty="n", ncol=1)
@@ -504,7 +510,7 @@ shinyServer(
     
     session$onSessionEnded(function() {
       log.txt <- tic.log(format = TRUE)
-      write.table(unlist(log.txt), sprintf('log_%s.txt', format(Sys.time(),"%Y-%m-%d_%H.%M.%S")), sep="\t")
+      write.table(unlist(log.txt), sprintf('name_%s,seqnumber_%d,timestamp_%s.txt', fname, length(udata$AA.JUNCTION), format(Sys.time(),"%Y-%m-%d_%H.%M.%S")), sep="\t")
     })
     
     })    
