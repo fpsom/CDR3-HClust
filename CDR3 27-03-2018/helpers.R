@@ -416,7 +416,7 @@ Den <- function(lev,df,lastlist,Clus,flagtic,algo,threshold1,threshold2,enthr,lo
       if(is.null(FindNode(xN,(sprintf("%d",i)))$isLeaf) && is.element(i, jfjf) == FALSE){
         levtel[i] = NA
         Clus[i+1,] = NA
-        ff[i+1,] = NA
+        #ff[i+1,] = NA
       }
     }
   }
@@ -441,7 +441,7 @@ LogoLev <- function(lev,lastlist,df,flagtic,logFile){
       en = toc(quiet = TRUE)
       cat(paste0(sprintf("LogoLev -- Level: %d ", lev),"\t","-","\t","-","\t",en$toc - en$tic), file=logFile, append=TRUE, sep = "\n")
     }
-    print("Den yparxei")
+    NULL
   }else{
     t1 = which(lastlist$clep == lev)
     listff = list()
@@ -476,8 +476,16 @@ LogoCl <- function(cl,lastlist,df,flagtic,logFile){
     cat(paste0(sprintf("LogoCl -- Cluster: %d ", cl),"\t","-","\t","-","\t",en$toc - en$tic), file=logFile, append=TRUE, sep = "\n")
   }
   if(is.na(lastlist$clep[cl])){
-    print("Den yparxei")
+   # if(flagtic == TRUE){
+  #    en = toc(quiet = TRUE)
+  #    cat(paste0(sprintf("LogoCl -- Cluster: %d ", cl),"\t","-","\t","-","\t",en$toc - en$tic), file=logFile, append=TRUE, sep = "\n")
+  #  }
+   NULL
   }else{
+    if(flagtic == TRUE){
+      en = toc(quiet = TRUE)
+      cat(paste0(sprintf("LogoCl -- Cluster: %d ", cl),"\t","-","\t","-","\t",en$toc - en$tic), file=logFile, append=TRUE, sep = "\n")
+    }
     ggseqlogo(na.omit(df[df[names(df) == sprintf('level.%d', lastlist$clep[cl])] == cl,]$AA.JUNCTION), method = "prob", col_scheme=cs1)
   }
 }
@@ -486,8 +494,11 @@ LogoCl <- function(cl,lastlist,df,flagtic,logFile){
 BarLev <- function(lev,lastlist,perlist,persimlist,Clus,let,sim,cho,flagtic,logFile){
   if(flagtic == TRUE) tic()
   if(cho == "Identity"){
+    
     if( is.element(lev,lastlist$clep) == FALSE){
-      print("Den yparxei")
+      #print("Den yparxei")
+      #return(NULL)
+      plot(1, type="n", axes=F, xlab="", ylab="")
     }else{
       t2 = which(lastlist$clep == lev)
       if(length(t2) %% 3 == 0){
@@ -505,8 +516,11 @@ BarLev <- function(lev,lastlist,perlist,persimlist,Clus,let,sim,cho,flagtic,logF
     }
   }else{
     if( is.element(lev,lastlist$clep) == FALSE){
-      print("Den yparxei")
+      #print("Den yparxei")
+      #return(NULL)
+      plot(1, type="n", axes=F, xlab="", ylab="")
     }else{
+      
       t2 = which(lastlist$clep == lev)
       if(length(t2) %% 3 == 0){
         par(mfrow = c(length(t2)%/%3,3))
@@ -534,7 +548,9 @@ BarCl <- function(cl,perlist,persimlist,Clus,let,sim,cho,lastlist,flagtic,logFil
   if(flagtic == TRUE) tic()
   if(cho == "Identity"){
     if(is.na(lastlist$clep[cl])){
-      print("Den yparxei")
+      #print("Den yparxei")
+      #return(NULL)
+      plot(1, type="n", axes=F, xlab="", ylab="")
     }else{
       par(mar=c(3,3,4,4),xpd=TRUE)
       output <- matrix(unlist(perlist[cl]), ncol = str_length(lastlist$udata$AA.JUNCTION[1]), byrow = FALSE)
@@ -543,7 +559,9 @@ BarCl <- function(cl,perlist,persimlist,Clus,let,sim,cho,lastlist,flagtic,logFil
     }
   }else{
     if(is.na(lastlist$clep[cl])){
-      print("Den yparxei")
+      #print("Den yparxei")
+      #return(NULL)
+      plot(1, type="n", axes=F, xlab="", ylab="")
     }else{
       par(mar=c(3,3,4,4),xpd=TRUE)
       output <- matrix(unlist(persimlist[cl]), ncol = str_length(lastlist$udata$AA.JUNCTION[1]), byrow = FALSE)
@@ -560,12 +578,13 @@ BarCl <- function(cl,perlist,persimlist,Clus,let,sim,cho,lastlist,flagtic,logFil
 # Sequences and Id's for specific level
 AminoLev <- function(level,lastlist,df,Clus,flagtic,logFile){
   if(flagtic == TRUE) tic()
-  if( is.element(lev,lastlist$clep) == FALSE){
+  
+  if( is.element(level,lastlist$clep) == FALSE){
     if(flagtic == TRUE){
       en = toc(quiet = TRUE)
       cat(paste0(sprintf("AminoLev -- Level: %d ", level),"\t","-","\t","-","\t",en$toc - en$tic), file=logFile, append=TRUE, sep = "\n")
     }
-    print("Den yparxei")
+    x4 = table(NA)
   }else{
     sum(Clus[Clus$level == level,]$seqnum) # akoloy8ies sto level
     x4 = data_frame("Sequence.ID" = character(0),"AA.JUNCTION" = character(0))
@@ -595,29 +614,24 @@ AminoLev <- function(level,lastlist,df,Clus,flagtic,logFile){
 # Sequences and Id's for specific cluster
 AminoCl <- function(clust,lastlist,df,flagtic,logFile){
   #if(flagtic == TRUE) tic()
-  if(is.na(lastlist$clep[clust])){
-    #if(flagtic == TRUE){
-    #  en = toc(quiet = TRUE)
-    #  cat(paste0("AminoCl","\t","-","\t","-","\t",en$toc - en$tic), file=logFile, append=TRUE, sep = "\n")
-    #}
-    print("Den yparxei")
+  if(clust == 0){
+    x3 = data.frame("Sequence.ID" = df$Sequence.ID, "AA.JUNCTION" = df$AA.JUNCTION)
   }else{
-    if(clust == 0){
-      x3 = data.frame("Sequence.ID" = df$Sequence.ID, "AA.JUNCTION" = df$AA.JUNCTION)
-    }else{
-      #lastlist$clep[clust]
+    if(is.na(lastlist$clep[clust]) == FALSE){
       x3 = data.frame(na.omit(df[df[which(names(df) == sprintf("level.%d", lastlist$clep[clust]))] == clust, ]$Sequence.ID), na.omit(df[df[which(names(df) == sprintf("level.%d", lastlist$clep[clust]))] == clust, ]$AA.JUNCTION))
       names(x3) = c("Sequence.ID","AA.JUNCTION")
       se = x3$Sequence.ID
       aa = as.character(x3$AA.JUNCTION)
       aa = as.list(aa)
       names(aa) = se 
+    }else{
+      x3 = table(NA)
     }
     #if(flagtic == TRUE){
     #  en = toc(quiet = TRUE)
     #  cat(paste0("AminoCl","\t","-","\t","-","\t",en$toc - en$tic), file=logFile, append=TRUE, sep = "\n")
     #}
-    x3 # Print in console
+    x3 # Print in console 
   }
 }
 
@@ -836,18 +850,19 @@ idencl <- function(cl,Clus,cho,flagtic,logFile){
       }
       na.omit(Clus[Clus$ClusterId == cl,])$Similarity 
     }
-  }else{
+  #}else{
     if(flagtic == TRUE){
       en = toc(quiet = TRUE)
       cat(paste0(sprintf("idencl -- Cluster :%d ", cl),"\t","-","\t","-","\t",en$toc - en$tic), file=logFile, append=TRUE, sep = "\n")
     }
-    "Den yparxei"
+    #"Den yparxei"
+   # return(NULL)
   }
 }
 
 EmPin <- function(lastlist,Clus,dfsd,flagtic,logFile){
   if(flagtic == TRUE) tic()
-  for (i in 0:(max(lastlist$clep))) {
+  for (i in 0:(max(na.omit(lastlist$clep))) ) {
     t1 = sum(na.omit(Clus[Clus$level == i,]$Identity)) /  length(na.omit(Clus[Clus$level == i,]$Identity))
     t2 = sd(na.omit(Clus[Clus$level == i,]$Identity))
     t3 = sum(na.omit(Clus[Clus$level == i,]$Similarity)) /  length(na.omit(Clus[Clus$level == i,]$Similarity))
@@ -867,7 +882,7 @@ Netw <- function(lev,thr,thrt,netyp,df,lastlist,Clus,sim,altsim,ts,shth,net_sil,
   if(flagtic == TRUE) tic()
   df = df[ do.call( order , df[ , match(  colnames(df[str_which(names(df), "level.")]) , names(df) ) ]  ) , ]
   df_args <- c(df[str_which(names(df), "level.")], sep="/")
-  if(lev == max(lastlist$clep)){
+  if(lev == max(na.omit(lastlist$clep))){
     df$pathString<- do.call(paste, df_args)
     kk = df$pathString
     for(i in 1:length(kk)){

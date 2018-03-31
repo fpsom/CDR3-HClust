@@ -117,13 +117,13 @@ shinyServer(
       
       enthr = input$thr_en
       if(enthr == TRUE){
-        lev = max(lastlist$clep)
+        lev = max(na.omit(lastlist$clep))
         threshold1 = input$thr_1
         threshold2 = input$thr_2
         algo = input$algorithm_type
         df = df[ do.call( order , df[ , match(  colnames(df[str_which(names(df), "level.")]) , names(df) ) ]  ) , ]
         df_args <- c(df[str_which(names(df), "level.")], sep="/")
-        if(lev == max(lastlist$clep)){
+        if(lev == max(na.omit(lastlist$clep))){
           df$pathString<- do.call(paste, df_args)
           kk = df$pathString
           for(i in 1:length(kk)){
@@ -231,10 +231,12 @@ shinyServer(
           }
         }
         xN <- as.Node(x)
+        rm(lev)
+        lastlist$udata = x
+        df = x
+        lastlist$clep = levtel
       }
-      lastlist$udata = x
-      df = x
-      lastlist$clep = levtel
+      
       mm = 1
       #fname = input$fileIn$name
       
@@ -292,6 +294,7 @@ shinyServer(
         if (is.null(input$fileIn)) return()
         Den(input$tree_level,df,lastlist,Clus,flagtic,input$algorithm_type,threshold1,threshold2,input$thr_en,logFile)
       })
+      
       output$coltre <- renderCollapsibleTree({
         if (is.null(input$fileIn)) return()
         cc(df,Clus,flagtic,logFile)
@@ -299,7 +302,12 @@ shinyServer(
     
       output$logolev <- renderPlot({
         if (is.null(input$fileIn)) return()
-        plot(LogoLev(input$logo_level,lastlist,df,flagtic,logFile))
+        lole = LogoLev(input$logo_level,lastlist,df,flagtic,logFile)
+        if (is.null(lole)){
+          plot(1, type="n", axes=F, xlab="", ylab="")
+        }else{
+          plot(lole)
+        }
       })
     
       output$downloadLogoLevel <- downloadHandler(
@@ -312,7 +320,12 @@ shinyServer(
     
       output$logocl <- renderPlot({
         if (is.null(input$fileIn)) return()
-        plot(LogoCl(input$logo_cluster,lastlist,df,flagtic,logFile))
+        locl = LogoCl(input$logo_cluster,lastlist,df,flagtic,logFile)
+        if (is.null(locl)){
+          plot(1, type="n", axes=F, xlab="", ylab="")
+        }else{
+          plot(locl)
+        }
       }) 
     
       output$downloadLogoCluster <- downloadHandler( 
@@ -504,7 +517,7 @@ shinyServer(
         condition = "input.Tree % 2 == 1",
         br(),
         br(),
-        numericInput("tree_level", "Select max level of the tree:", 5,  min = 1, max = max(lastlist$clep), width="140px"),
+        numericInput("tree_level", "Select max level of the tree:", 5,  min = 1, max = max(na.omit(lastlist$clep)), width="140px"),
         br(),
         grVizOutput("tre", width = "1500px", height = "1000px")
       )
@@ -523,7 +536,7 @@ shinyServer(
         condition = "input.Logo % 2 == 1",
         br(),
         br(),
-        numericInput("logo_level", "Select level to show:", 5,  min = 1, max = max(lastlist$clep), width="140px"),
+        numericInput("logo_level", "Select level to show:", 5,  min = 1, max = max(na.omit(lastlist$clep)), width="140px"),
         br(),
         plotOutput("logolev"),
         br(),
@@ -549,7 +562,7 @@ shinyServer(
         condition = "input.Barplot % 2 == 1",
         br(),
         br(),
-        numericInput("bar_level", "Select level to show:", 5,  min = 1, max = max(lastlist$clep), width="140px"),
+        numericInput("bar_level", "Select level to show:", 5,  min = 1, max = max(na.omit(lastlist$clep)), width="140px"),
         selectInput("barl_style", "Select Identity or Similarity", choices = c("Identity","Similarity")),
         br(),
         plotOutput("barlev", width = "1500px", height = "1000px"),
@@ -575,7 +588,7 @@ shinyServer(
         condition = "input.Amino % 2 == 1",
         br(),
         br(),
-        numericInput("amino_level", "Select level to show:", 5,  min = 1, max = max(lastlist$clep), width="140px"),
+        numericInput("amino_level", "Select level to show:", 5,  min = 1, max = max(na.omit(lastlist$clep)), width="140px"),
         br(),
         tableOutput('aminolev')
       )
@@ -607,7 +620,7 @@ shinyServer(
         condition = "input.AminoIde % 2 == 1",
         br(),
         br(),
-        numericInput("aminoide_level", "Select level to show:", 5,  min = 1, max = max(lastlist$clep), width="140px"),
+        numericInput("aminoide_level", "Select level to show:", 5,  min = 1, max = max(na.omit(lastlist$clep)), width="140px"),
         selectInput("aminoide_lever", "Select Identity or Similarity", choices = c("Identity","Similarity")),
         br(),
         tableOutput('idenaminolev')
@@ -632,7 +645,7 @@ shinyServer(
         condition = "input.ConsensusSeq % 2 == 1",
         br(),
         br(),
-        numericInput("opt_level", "Select level to show:", 5,  min = 1, max = max(lastlist$clep), width="140px"),
+        numericInput("opt_level", "Select level to show:", 5,  min = 1, max = max(na.omit(lastlist$clep)), width="140px"),
         br("Identity Consensus Sequence for a specific level"),
         textOutput('opt1lev'),
         br("Identity Consensus Sequence with higher frequency letters for a specific level"),
@@ -676,7 +689,7 @@ shinyServer(
         condition = "input.Network % 2 == 1",
         br(),
         br(),
-        inline( numericInput("net_level", "Select level to show:", 2,  min = 0, max = max(lastlist$clep), width="140px")),
+        inline( numericInput("net_level", "Select level to show:", 2,  min = 0, max = max(na.omit(lastlist$clep)), width="140px")),
         inline(selectInput("net_style", "Select Whole or Partial", choices = c("whole","partial"))),
         inline(selectInput("thr_style", "Select Distance, String Identity Similarity, String Group Similarity or Final distance", choices = c("Distance","StrIdentSimilarity","StrGroupSimilarity","FinalDis"))),
         inline(numericInput("thr_value", "Select threshold value:", 2,  min = 1, max = 100, width="140px")),
