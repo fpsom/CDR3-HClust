@@ -464,7 +464,7 @@ shinyServer(
           if(netyp == "whole"){
             par(mfrow = c(1,2))
             plot(net0.copy, edge.color=na.omit(pal1[( E(net0.copy)$width %/% 1) +1]), edge.curved=.1, vertex.label.color = "black") #plot the network graph
-            legend("topleft", inset=c(0.1,0.2), colnames(df[str_which(names(df), "level.")])[1:(max(bb)+1)], pch=21,
+            legend("topleft", inset=c(0.1,0.2), colnames(df[str_which(names(df), "level.")])[1:(max(na.omit(bb))+1)], pch=21,
                    col="#777777", pt.bg=colrs, pt.cex=2, cex=.8, bty="n", ncol=1)
             legend("topright", inset=c(0.1,0.2), c("0-1","1-2","2-3","3-4","4-5","5"), pch=21,
                    col="#777777", pt.bg=pal1, pt.cex=2, cex=.8, bty="n", ncol=1,title = "Relationship strength")

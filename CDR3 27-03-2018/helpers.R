@@ -986,8 +986,8 @@ Netw <- function(lev,thr,thrt,netyp,df,lastlist,Clus,sim,altsim,ts,shth,net_sil,
       }
       if(is.null(FindNode(xN,(sprintf("%d",i)))$isLeaf) && is.element(i, jfjf) == FALSE){
         levtel[i] = NA
-        Clus[i+1,] = NA
-        ff[i+1,] = NA
+        #Clus[i+1,] = NA
+        #ff[i+1,] = NA
       }
     }
     xN <- as.Node(x)
@@ -1141,7 +1141,7 @@ Netw <- function(lev,thr,thrt,netyp,df,lastlist,Clus,sim,altsim,ts,shth,net_sil,
   #XRWMA
   # Generate colors based on media type:
   colrs <- c("#1E90FF", "#BA55D3", "#0000FF", "#557fd2", "#54d17e", "#8aad62", "#C6E2FF", "#e5e234", "#FFD700", "#00EE00", "#C1FFC1", "#ea8509", "#54FF9F", "#FF0000", "#ed3b1c", "#ed1c7a", "#0c0c0c", "#b8d8af", "#ED9121","#45f713")
-  colrs = colrs[1:(max(bb)+1)]
+  colrs = colrs[1:(max(na.omit(bb))+1)]
   V(net0)$color <- colrs[bb+1]
   V(net1)$color <- colrs[bb+1]
   
@@ -1149,11 +1149,10 @@ Netw <- function(lev,thr,thrt,netyp,df,lastlist,Clus,sim,altsim,ts,shth,net_sil,
   deg <- (Clus$seqnum[1:length(bb)] / Clus$seqnum[1]) * 20
   V(net0)$size <- deg
   V(net1)$size <- deg
-  
   # The labels are currently node IDs.
   # Setting them to NA will render no labels:
-  V(net0)$label <- V(net0)-1
-  V(net1)$label <- V(net1)-1
+  V(net0)$label <- Clus$ClusterId[1:length(bb)]
+  V(net1)$label <- Clus$ClusterId[1:length(bb)]
   
   # Set edge width based on weight:
   hhh = na.omit(as.vector(t(ffg3)))
@@ -1169,6 +1168,7 @@ Netw <- function(lev,thr,thrt,netyp,df,lastlist,Clus,sim,altsim,ts,shth,net_sil,
   pal1 <- rainbow(6, alpha=1) 
   
   net0.copy <- igraph::delete.edges(net0, which(E(net0)$width == 0))
+  net0.copy <- igraph::delete.vertices(net0.copy, is.na(V(net0)$size))
   
   net1.copy <- igraph::delete.edges(net1, which(E(net1)$width == 0))
   
