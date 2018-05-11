@@ -119,37 +119,39 @@ Matrices <- function(list1,leaf,let,sim,d,algo,algocol,backcol,backcolj6,logFile
     persim[length(sim)+1,i] = entropy(xtabs(freq ~ X1, temptab1),base = exp(1))
   }
   
-  mymat3 = matrix(0,nrow=length(let), ncol=str_length(udata$AA.JUNCTION[1]))
-  #permat2 = matrix(0,nrow=length(let) + 1, ncol=str_length(udata$AA.JUNCTION[1]))
-  simmat3 = matrix(0,nrow = length(sim),ncol =str_length(udata$AA.JUNCTION[1]))
-  #persim2 = matrix(0,nrow = length(sim)+1,ncol =str_length(udata$AA.JUNCTION[1]))
-  rownames(mymat3) = let
-  #rownames(permat2) = c(let,"Entropy")
-  rownames(simmat3) = c("F","W","Al","Su","P","G","Y","Hy","Ba","Ac","Am")
-  permat3 = matrix(0,nrow=length(let) + 1, ncol=str_length(udata$AA.JUNCTION[1]))
-  rownames(permat3) = c(let,"Entropy")
-  persim3 = matrix(0,nrow = length(sim)+1,ncol =str_length(udata$AA.JUNCTION[1]))
-  rownames(persim3) = c("F","W","Al","Su","P","G","Y","Hy","Ba","Ac","Am","Entropy")
-  trimudata = strsplit(udata[udata$clusters == br,]$AA.JUNCTION,"")
-  align = data.frame(matrix(unlist(trimudata), nrow=length(trimudata), byrow=T))
-  exc = 1:algocol
-  exc2 = (str_length(udata[udata$clusters == br,]$AA.JUNCTION[1]) - backcol):str_length(udata[udata$clusters == br,]$AA.JUNCTION[1])
-  exc = c(exc,exc2)
-  for(i in 1:length(exc)){
-    temptab = plyr::count(align[exc[i]],vars = colnames(align)[exc[i]])
-    names(temptab)[1] = "X1"
-    mymat3[which(is.na(match(names(mymat3[,exc[i]]),as.vector(unlist(temptab[1])))) == FALSE),exc[i]] = as.vector(unlist(temptab[2]))
-    permat3[length(let) + 1,exc[i]] = entropy(xtabs(freq ~ X1, temptab),base=exp(1))
-    temptab1 = temptab
-    temptab1[1] = names(sim)[sapply(as.vector(unlist(temptab1[1])),function(x) which(str_detect(sim,x)))]
-    temptab1 = aggregate(temptab1[2], by=temptab1[1], FUN=sum)
-    simmat3[sapply(as.vector(unlist(temptab1[1])),function(x) which(names(sim) == x)),exc[i]] = as.vector(unlist(temptab1[2]))
-    persim3[length(sim)+1,i] = entropy(xtabs(freq ~ X1, temptab1),base = exp(1))
+  if(algocol != 0 && backcol!=0){
+    mymat3 = matrix(0,nrow=length(let), ncol=str_length(udata$AA.JUNCTION[1]))
+    #permat2 = matrix(0,nrow=length(let) + 1, ncol=str_length(udata$AA.JUNCTION[1]))
+    simmat3 = matrix(0,nrow = length(sim),ncol =str_length(udata$AA.JUNCTION[1]))
+    #persim2 = matrix(0,nrow = length(sim)+1,ncol =str_length(udata$AA.JUNCTION[1]))
+    rownames(mymat3) = let
+    #rownames(permat2) = c(let,"Entropy")
+    rownames(simmat3) = c("F","W","Al","Su","P","G","Y","Hy","Ba","Ac","Am")
+    permat3 = matrix(0,nrow=length(let) + 1, ncol=str_length(udata$AA.JUNCTION[1]))
+    rownames(permat3) = c(let,"Entropy")
+    persim3 = matrix(0,nrow = length(sim)+1,ncol =str_length(udata$AA.JUNCTION[1]))
+    rownames(persim3) = c("F","W","Al","Su","P","G","Y","Hy","Ba","Ac","Am","Entropy")
+    trimudata = strsplit(udata[udata$clusters == br,]$AA.JUNCTION,"")
+    align = data.frame(matrix(unlist(trimudata), nrow=length(trimudata), byrow=T))
+    exc = 1:algocol
+    exc2 = (str_length(udata[udata$clusters == br,]$AA.JUNCTION[1]) - backcol):str_length(udata[udata$clusters == br,]$AA.JUNCTION[1])
+    exc = c(exc,exc2)
+    for(i in 1:length(exc)){
+      temptab = plyr::count(align[exc[i]],vars = colnames(align)[exc[i]])
+      names(temptab)[1] = "X1"
+      mymat3[which(is.na(match(names(mymat3[,exc[i]]),as.vector(unlist(temptab[1])))) == FALSE),exc[i]] = as.vector(unlist(temptab[2]))
+      permat3[length(let) + 1,exc[i]] = entropy(xtabs(freq ~ X1, temptab),base=exp(1))
+      temptab1 = temptab
+      temptab1[1] = names(sim)[sapply(as.vector(unlist(temptab1[1])),function(x) which(str_detect(sim,x)))]
+      temptab1 = aggregate(temptab1[2], by=temptab1[1], FUN=sum)
+      simmat3[sapply(as.vector(unlist(temptab1[1])),function(x) which(names(sim) == x)),exc[i]] = as.vector(unlist(temptab1[2]))
+      persim3[length(sim)+1,i] = entropy(xtabs(freq ~ X1, temptab1),base = exp(1))
+    }
+    permat3[1:length(let),] = (mymat3 / length(udata[udata$clusters == br,]$AA.JUNCTION)) * 100
+    persim3[1:length(sim),] = (simmat3 / length(udata[udata$clusters == br,]$AA.JUNCTION)) * 100
+    permat[1:length(let),exc] = permat3[1:length(let),exc] 
+    persim[1:length(sim),exc] = persim3[1:length(sim),exc] 
   }
-  permat3[1:length(let),] = (mymat3 / length(udata[udata$clusters == br,]$AA.JUNCTION)) * 100
-  persim3[1:length(sim),] = (simmat3 / length(udata[udata$clusters == br,]$AA.JUNCTION)) * 100
-  permat[1:length(let),exc] = permat3[1:length(let),exc] 
-  persim[1:length(sim),exc] = persim3[1:length(sim),exc]
   
   listxx$temp = permat
   names(listxx)[length(listxx)] = sprintf('permat_br.%d', br) # Save the permat with this format
