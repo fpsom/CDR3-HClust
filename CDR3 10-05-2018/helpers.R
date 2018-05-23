@@ -1361,19 +1361,45 @@ Netw <- function(lev,thr,thrt,netyp,df,lastlist,Clus,sim,altsim,ts,shth,net_sil,
   }
   
   #find max
+ # ma = max(ffg[is.na(ffg) == FALSE])
+#  ffg[lower.tri(ffg)] = NA
+#  ffg2[lower.tri(ffg2)] = NA
+#  ffg2sim[lower.tri(ffg2sim)] = NA
+#  #ffg[which(ffg == 0)] = ma #gia na mhn fainontai velakia pisw
+#  ffg2 = str_length(lastlist$udata$AA.JUNCTION[1]) - ffg2
+#  ffg2sim = str_length(lastlist$udata$AA.JUNCTION[1]) - ffg2sim
+#  ffg3 = (2/str_length(lastlist$udata$AA.JUNCTION[1])) * ffg2 + (2/str_length(lastlist$udata$AA.JUNCTION[1])) * ffg2sim + (2 / ma) * (ma - ffg)
+#  
+#  diag(ffg) = 0
+#  diag(ffg2) = 0
+#  diag(ffg2sim) = 0
+#  diag(ffg3) = 0
+  #find max
   ma = max(ffg[is.na(ffg) == FALSE])
+  ffg[ffg == 0] = ma
+  ffg2[ffg2 == 0] = str_length(lastlist$udata$AA.JUNCTION[1])
+  ffg2sim[ffg2sim == 0] = str_length(lastlist$udata$AA.JUNCTION[1])
   ffg[lower.tri(ffg)] = NA
   ffg2[lower.tri(ffg2)] = NA
   ffg2sim[lower.tri(ffg2sim)] = NA
+  #ffg[ffg == 0] = NA
+  #ffg2[ffg2 == 0] = NA
+  #ffg2sim[ffg2sim == 0] = NA
   #ffg[which(ffg == 0)] = ma #gia na mhn fainontai velakia pisw
+  ffg = ffg / ma * 100
   ffg2 = str_length(lastlist$udata$AA.JUNCTION[1]) - ffg2
+  ffg2 = ffg2 / str_length(lastlist$udata$AA.JUNCTION[1]) * 100
   ffg2sim = str_length(lastlist$udata$AA.JUNCTION[1]) - ffg2sim
-  ffg3 = (2/str_length(lastlist$udata$AA.JUNCTION[1])) * ffg2 + (2/str_length(lastlist$udata$AA.JUNCTION[1])) * ffg2sim + (2 / ma) * (ma - ffg)
+  ffg2sim = ffg2sim / str_length(lastlist$udata$AA.JUNCTION[1]) * 100
+  #ffg3 = (2/str_length(lastlist$udata$AA.JUNCTION[1])) * ffg2 + (2/str_length(lastlist$udata$AA.JUNCTION[1])) * ffg2sim + (2 / ma) * (ma - ffg)
+  
+  
   
   diag(ffg) = 0
   diag(ffg2) = 0
   diag(ffg2sim) = 0
   diag(ffg3) = 0
+  ffg3 = (ffg2 + ffg2sim + ffg) / 3
   
   normalize <- function(x) {
     return ((x - min(x[is.na(x) == FALSE])) / (max(x[is.na(x) == FALSE]) - min(x[is.na(x) == FALSE])))
@@ -1458,7 +1484,7 @@ Netw <- function(lev,thr,thrt,netyp,df,lastlist,Clus,sim,altsim,ts,shth,net_sil,
   # Set edge width based on weight:
   hhh = na.omit(as.vector(t(ffg3)))
   hhh1 = na.omit(as.vector(t(tempor3)))
-  E(net0)$width <- hhh 
+  E(net0)$width <- hhh * 0.06 
   E(net1)$width <- hhh1 
   
   #change arrow size and edge color:
