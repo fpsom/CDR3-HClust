@@ -9,6 +9,7 @@ ipak(packages)
 
 data <- read.csv(file.choose(), header = TRUE, sep = ";")
 udata <- data[c(1,3)]
+udata <- data
 udata = data[,c("Sequence.ID","J.GENE.and.allele","AA.JUNCTION","V.GENE.and.allele")]
 udata$AA.JUNCTION <- as.character(udata$AA.JUNCTION)
 sim = list("F","W",c("A","I","L","V"),c("M","C"),"P","G","Y",c("T","S"),c("H","K","R"),c("E","D"),c("Q","N"))
@@ -46,9 +47,9 @@ names(listax)[length(listax)] = sprintf('cl.%d', 0)
 listq = list("listax" = listax,"ggdf" = ggdf, "dfsum" = dfsum,"list" = listxx, "listn" = listyy,"udata" = udata,"permat"= NA, "persim" = NA, "br" = br, "cl" = cl, "met" = met, "ep" = ep , "clep" = clep, "nn" = nn, "sumper" = NA,"sumper2" = NA, "ela" = NA, "cel" = NA,"endper" = endper, "last" = last,"progend" = progend, "leaf" = FALSE,"leaf2" = FALSE)
 algo = "Identity"
 #algo = "Similarity"
-algocol = 2
-backcol = 3
-backcolj6 = 3
+algocol = 0
+backcol = 0
+backcolj6 = 0
 listb = listq
 levcut = 3
 levcut =levcut +1
@@ -445,10 +446,10 @@ if(leaf2 == FALSE && poss != 0){
   br = br + 1 # Increase the branch by 1
   met = met + 2 # Increase the counter by 2
   list2 = list("listax" = listax,"ggdf" = ggdf, "dfsum" = list2$dfsum,"list" = list2$list, "listn" = list2$listn, "udata" = udata,"permat"= list2$permat, "persim" = list2$persim, "br" = br, "cl" = cl, "met" = met, "ep"= ep, "clep" = clep,"nn" = nn, "sumper" = list2$sumper, "sumper2" = list2$sumper2, "ela" = ela, "cel" = cel,"endper" = list2$endper, "last" = list2$last,"progend" = progend, "leaf" = leaf,"leaf2" = leaf2)
-  if( ((clep[br-1] < clep[br]) && (sum(clep == clep[br]) != (2^clep[br]))) == TRUE && (length(which(udata$clusters == br)) > 1) ){ # If the next branch is in the next level
+  if( ((clep[br-1] < clep[br]) && (sum(clep == clep[br]) != (2^clep[br]))) == TRUE && (length(which(udata$clusters == br)) > 2) ){ # If the next branch is in the next level
     met = geomSeq(1,2,1,1000)[ep+1]
   }
-  while (length(which(udata$clusters == br)) <= 1){ # While the number of sequences in the branch is less than 2, go to the next branch and change counter 
+  while (length(which(udata$clusters == br)) <= 2){ # While the number of sequences in the branch is less than 2, go to the next branch and change counter 
     if(is.na(str_length(udata[udata$clusters == br,]$AA.JUNCTION[1]))){
       print("exittttttttt@@@@@@@22")
       #print(paste0("br = ",br))
@@ -1439,11 +1440,11 @@ EmPin <- function(lastlist,Clus,dfsd,flagtic){
 
 lastlist = lastlist2
 df = lastlist$udata
-lev = 5
+lev = 3
 thrt = "Distance"
 thr = 0
 netyp = "Whole"
-enthr = TRUE
+enthr = FALSE
 threshold1 = 7
 threshold2 = 10
 net_sil = FALSE
@@ -1662,14 +1663,20 @@ Netw <- function(lev,thr,thrt,netyp,df,lastlist,Clus,threshold1,threshold2,enthr
   #ffg2[ffg2 == 0] = NA
   #ffg2sim[ffg2sim == 0] = NA
   #ffg[which(ffg == 0)] = ma #gia na mhn fainontai velakia pisw
+  ffg = ffg / ma * 100
   ffg2 = str_length(lastlist$udata$AA.JUNCTION[1]) - ffg2
+  ffg2 = ffg2 / str_length(lastlist$udata$AA.JUNCTION[1]) * 100
   ffg2sim = str_length(lastlist$udata$AA.JUNCTION[1]) - ffg2sim
-  ffg3 = (2/str_length(lastlist$udata$AA.JUNCTION[1])) * ffg2 + (2/str_length(lastlist$udata$AA.JUNCTION[1])) * ffg2sim + (2 / ma) * (ma - ffg)
+  ffg2sim = ffg2sim / str_length(lastlist$udata$AA.JUNCTION[1]) * 100
+  #ffg3 = (2/str_length(lastlist$udata$AA.JUNCTION[1])) * ffg2 + (2/str_length(lastlist$udata$AA.JUNCTION[1])) * ffg2sim + (2 / ma) * (ma - ffg)
+  
+  
   
   diag(ffg) = 0
   diag(ffg2) = 0
   diag(ffg2sim) = 0
   diag(ffg3) = 0
+  ffg3 = (ffg2 + ffg2sim + ffg) / 3
   
   normalize <- function(x) {
     return ((x - min(x[is.na(x) == FALSE])) / (max(x[is.na(x) == FALSE]) - min(x[is.na(x) == FALSE])))
@@ -1757,7 +1764,7 @@ Netw <- function(lev,thr,thrt,netyp,df,lastlist,Clus,threshold1,threshold2,enthr
   # Set edge width based on weight:
   hhh = na.omit(as.vector(t(ffg3)))
   hhh1 = na.omit(as.vector(t(tempor3)))
-  E(net0)$width <- hhh 
+  E(net0)$width <- hhh
   E(net1)$width <- hhh1 
   
   #change arrow size and edge color:
