@@ -70,7 +70,7 @@ function(request) {navbarPage(
               br(),
               br(),
               tags$div(style="display:inline-block;", selectInput("algorithm_type", "Select Identity or Similarity", choices = c("Identity","Similarity")) ),
-              tags$div(style="display:inline-block;",numericInput("column_num", "Select columns to exclude from start[0 - value]:", 0,  min = 0, max = 20, width="140px")),
+              tags$div(style="display:inline-block;",numericInput("column_num", "Select columns to exclude from start [0 - value]:", 0,  min = 0, max = 20, width="140px")),
               tags$div(style="display:inline-block;",numericInput("back_num", "Select columns to exclude from end [0 - value]:", 3,  min = 0, max = 20, width="140px")),
               tags$div(style="display:inline-block;",numericInput("backj6_num", "Select columns to exclude from end if J6 [0 - value]:", 3,  min = 0, max = 20, width="140px")),
               br(),

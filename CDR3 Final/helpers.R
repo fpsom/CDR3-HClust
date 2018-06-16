@@ -63,9 +63,9 @@ Matrices <- function(list1,leaf,let,sim,d,algo,algocol,backcol,backcolj6,logFile
       temptab = plyr::count(align[i],vars = colnames(align)[i])
       names(temptab)[1] = "X1"
       mymat1[which(is.na(match(names(mymat1[,i]),as.vector(unlist(temptab[1])))) == FALSE),i] = as.vector(unlist(temptab[2]))
-      #permat[length(let) + 1,i] = entropy(xtabs(freq ~ X1, temptab),base=exp(1))
       temptab1 = temptab
-      temptab1[1] = names(sim)[sapply(as.vector(unlist(temptab1[1])),function(x) which(str_detect(sim,x)))]
+      gg = as.vector(unlist(temptab1[1]))
+      temptab1[1] = sapply(1:length(gg),function(x) gsub('[[:digit:]]+', '', names(unlist(sim)[which(str_detect(unlist(sim),gg[x]))])))
       temptab1 = aggregate(temptab1[2], by=temptab1[1], FUN=sum)
       simmat1[sapply(as.vector(unlist(temptab1[1])),function(x) which(names(sim) == x)),i] = as.vector(unlist(temptab1[2]))
     }
@@ -81,7 +81,8 @@ Matrices <- function(list1,leaf,let,sim,d,algo,algocol,backcol,backcolj6,logFile
       mymat2[which(is.na(match(names(mymat2[,i]),as.vector(unlist(temptab[1])))) == FALSE),i] = as.vector(unlist(temptab[2]))
       permat[length(let) + 1,i] = entropy(xtabs(freq ~ X1, temptab),base=exp(1))
       temptab1 = temptab
-      temptab1[1] = names(sim)[sapply(as.vector(unlist(temptab1[1])),function(x) which(str_detect(sim,x)))]
+      gg = as.vector(unlist(temptab1[1]))
+      temptab1[1] = sapply(1:length(gg),function(x) gsub('[[:digit:]]+', '', names(unlist(sim)[which(str_detect(unlist(sim),gg[x]))])))
       temptab1 = aggregate(temptab1[2], by=temptab1[1], FUN=sum)
       simmat2[sapply(as.vector(unlist(temptab1[1])),function(x) which(names(sim) == x)),i] = as.vector(unlist(temptab1[2]))
       persim[length(sim)+1,i] = entropy(xtabs(freq ~ X1, temptab1),base = exp(1))
@@ -112,7 +113,8 @@ Matrices <- function(list1,leaf,let,sim,d,algo,algocol,backcol,backcolj6,logFile
     names(temptab)[1] = "X1"
     permat[length(let) + 1,i] = entropy(xtabs(freq ~ X1, temptab),base=exp(1))
     temptab1 = temptab
-    temptab1[1] = names(sim)[sapply(as.vector(unlist(temptab1[1])),function(x) which(str_detect(sim,x)))]
+    gg = as.vector(unlist(temptab1[1]))
+    temptab1[1] = sapply(1:length(gg),function(x) gsub('[[:digit:]]+', '', names(unlist(sim)[which(str_detect(unlist(sim),gg[x]))])))
     temptab1 = aggregate(temptab1[2], by=temptab1[1], FUN=sum)
     persim[length(sim)+1,i] = entropy(xtabs(freq ~ X1, temptab1),base = exp(1))
   }
@@ -138,7 +140,8 @@ Matrices <- function(list1,leaf,let,sim,d,algo,algocol,backcol,backcolj6,logFile
       mymat3[which(is.na(match(names(mymat3[,exc[i]]),as.vector(unlist(temptab[1])))) == FALSE),exc[i]] = as.vector(unlist(temptab[2]))
       permat3[length(let) + 1,exc[i]] = entropy(xtabs(freq ~ X1, temptab),base=exp(1))
       temptab1 = temptab
-      temptab1[1] = names(sim)[sapply(as.vector(unlist(temptab1[1])),function(x) which(str_detect(sim,x)))]
+      gg = as.vector(unlist(temptab1[1]))
+      temptab1[1] = sapply(1:length(gg),function(x) gsub('[[:digit:]]+', '', names(unlist(sim)[which(str_detect(unlist(sim),gg[x]))])))
       temptab1 = aggregate(temptab1[2], by=temptab1[1], FUN=sum)
       simmat3[sapply(as.vector(unlist(temptab1[1])),function(x) which(names(sim) == x)),exc[i]] = as.vector(unlist(temptab1[2]))
       persim3[length(sim)+1,i] = entropy(xtabs(freq ~ X1, temptab1),base = exp(1))
@@ -241,9 +244,9 @@ Choice <- function(list2,leaf,let,sim,d,algo,algocol,backcol,backcolj6,logFile){
         dddff2 = which(permat[,(algocol + 1):(ncol(permat)-backcol)][nrow(permat[,(algocol + 1):(ncol(permat)-backcol)]),cel[,2]] == dddff)
         ela = dddff2[1]
         if (length(dddff2)>1 && nn == FALSE){ # If the vector has 2 or more numbers means that we have columns with the same entropy and nn = FALSE in order not to double check the persim
-          dddff3 = persim[,(algocol + 1):(ncol(permat)-backcol)][sapply(1:length(dddff2), function (x){str_which(sim,let[cel[x,1]])}),cel[,2]]
+          dddff3 = persim[,(algocol + 1):(ncol(permat)-backcol)][sapply(1:length(dddff2), function (x){ str_which(names(sim),gsub('[[:digit:]]+', '', names(unlist(sim)[which(str_detect(unlist(sim),let[cel[x,1]]))])))}),cel[,2]]
           dddff3 = max(diag(dddff3))
-          dddff4 = which(diag( persim[,(algocol + 1):(ncol(permat)-backcol)][sapply(1:length(dddff2), function (x){str_which(sim,let[cel[x,1]])}),cel[,2]]) == dddff3)
+          dddff4 = which(diag( persim[,(algocol + 1):(ncol(permat)-backcol)][sapply(1:length(dddff2), function (x){str_which(names(sim),gsub('[[:digit:]]+', '', names(unlist(sim)[which(str_detect(unlist(sim),let[cel[x,1]]))])))}),cel[,2]]) == dddff3)
           ela = dddff4[1]
           if(length(dddff4)> 1){
             dddff5 = min(persim[,(algocol + 1):(ncol(permat)-backcol)][nrow(persim[,(algocol + 1):(ncol(permat)-backcol)]),cel[dddff4,2]])
@@ -960,9 +963,9 @@ Opt2 <- function(df,sim,alt,altsim,flagtic,logFile){
         xar[i] = names(f[1])
       }else{
         y = TRUE
-        d = str_which(sim,names(f[1]))
+        d = str_which(names(sim),gsub('[[:digit:]]+', '', names(unlist(sim)[which(str_detect(unlist(sim),names(f[1])))])))
         for(j in 2:length(f)){
-          y = y && str_detect(sim[d],names(f[j]))
+          y = y && is.element(names(f[j]),unlist(sim[d]))
         }
         if( y == TRUE){
           if(alt == TRUE){
@@ -990,10 +993,10 @@ Opt2New <- function(df,sim,logFile){
     for (i in 1:str_length(df$AA.JUNCTION[1])) {
       f <- table(str_sub(df$AA.JUNCTION,i,i))
       for(j in 1:length(f)){
-        if( length(which(str_detect(names(f),names(sim[str_which(sim,names(f)[j])])))) == 0 ){
-          names(f)[j] = names(sim[str_which(sim,names(f)[j])])
-        }else if(which(str_detect(names(f),names(sim[str_which(sim,names(f)[j])]))) != j){
-          f[which(str_detect(names(f),names(sim[str_which(sim,names(f)[j])])))] = f[which(str_detect(names(f),names(sim[str_which(sim,names(f)[j])])))] + f[j]
+        if( length(which(str_detect(names(f),names(sim[str_which(names(sim),gsub('[[:digit:]]+', '', names(unlist(sim)[which(str_detect(unlist(sim),names(f[j])))])))])))) == 0 ){
+          names(f)[j] = gsub('[[:digit:]]+', '', names(unlist(sim)[which(str_detect(unlist(sim),names(f[j])))]))
+        }else if(length(which(str_detect(names(f),names(sim[str_which(names(sim),gsub('[[:digit:]]+', '', names(unlist(sim)[which(str_detect(unlist(sim),names(f[j])))])))])))) != j){
+          f[which(str_detect(names(f),names(sim[str_which(names(sim),gsub('[[:digit:]]+', '', names(unlist(sim)[which(str_detect(unlist(sim),names(f[j])))])))])))] = f[which(str_detect(names(f),names(sim[str_which(names(sim),gsub('[[:digit:]]+', '', names(unlist(sim)[which(str_detect(unlist(sim),names(f[j])))])))])))] + f[j]
           names(f)[j] = "dip"
         }
       }
@@ -1347,7 +1350,7 @@ Netw <- function(lev,thr,thrt,netyp,df,lastlist,Clus,sim,altsim,ts,shth,net_sil,
         tempN2 = unlist(sss[hhh2[1]])
         # Distance of Node 2 from root of the tree
         tempN2 = tempN2[1:str_which(tempN2,sprintf("%d", bfbf[j]))]
-        tem = which(tempN1 == tempN2)
+        tem = which(tempN1 %in% tempN2)
         d1 = length(tempN1) - tem[length(tem)]
         d2 = length(tempN2) - tem[length(tem)]
         temp2N2 = paste(Opt(AminoCl( bfbf[j],lastlist,df,flagtic,logFile),flagtic,logFile),collapse = ' ')
@@ -1376,7 +1379,7 @@ Netw <- function(lev,thr,thrt,netyp,df,lastlist,Clus,sim,altsim,ts,shth,net_sil,
         tempN2 = FindNode(xN,(sprintf("%d", j-1)))
         # Distance of Node 2 from root of the tree
         tempN2 = tempN2$path
-        tem = which(tempN1 == tempN2)
+        tem = which(tempN1 %in% tempN2)
         d1 = length(tempN1) - tem[length(tem)]
         d2 = length(tempN2) - tem[length(tem)]
         temp2N2 = paste(Opt(AminoCl(j-1,lastlist,df,flagtic,logFile),flagtic,logFile),collapse = ' ')
